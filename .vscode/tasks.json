@@ -1,0 +1,48 @@
+{
+  // Arduino tasks for the Nano 33 IoT. Open any file in a sketch folder
+  // (e.g. firmware/imu_logger/imu_logger.ino), then:
+  //   Cmd+Shift+B           -> Compile
+  //   Cmd+Shift+P "Run Task" -> Upload, Monitor, Upload + Monitor, List boards
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Arduino: Compile",
+      "type": "shell",
+      "command": "${workspaceFolder}/tools/arduino.sh",
+      "args": ["compile", "${file}"],
+      "group": { "kind": "build", "isDefault": true },
+      "problemMatcher": { "base": "$gcc", "fileLocation": "absolute" },
+      "presentation": { "panel": "shared", "clear": true }
+    },
+    {
+      "label": "Arduino: Upload",
+      "type": "shell",
+      "command": "${workspaceFolder}/tools/arduino.sh",
+      "args": ["upload", "${file}"],
+      "group": "build",
+      "problemMatcher": { "base": "$gcc", "fileLocation": "absolute" },
+      "presentation": { "panel": "shared", "clear": true }
+    },
+    {
+      "label": "Arduino: Monitor",
+      "type": "shell",
+      "command": "${workspaceFolder}/tools/arduino.sh",
+      "args": ["monitor"],
+      "problemMatcher": [],
+      "presentation": { "panel": "dedicated", "focus": true }
+    },
+    {
+      "label": "Arduino: Upload + Monitor",
+      "dependsOrder": "sequence",
+      "dependsOn": ["Arduino: Upload", "Arduino: Monitor"],
+      "problemMatcher": []
+    },
+    {
+      "label": "Arduino: List boards",
+      "type": "shell",
+      "command": "${workspaceFolder}/tools/arduino.sh",
+      "args": ["boards"],
+      "problemMatcher": []
+    }
+  ]
+}
