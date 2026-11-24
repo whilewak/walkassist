@@ -12,6 +12,23 @@ that folder to the compiler. In the Arduino IDE, copy or symlink
 | `touch_test/` | Grip sensor test: touches, gestures, and the 2-minute hold test. |
 | `imu_logger/` | Reads both IMUs and the grip sensor at 100 Hz and streams CSV over USB. |
 
+## Pin map
+
+Full schematic: [`docs/circuit.svg`](../docs/circuit.svg). Everything runs at 3.3 V.
+
+| Nano pin | Connects to | Notes |
+|---|---|---|
+| 3V3, GND | All modules' power | Never 9 V here |
+| A4 (SDA), A5 (SCL) | MPU-6050 tip IMU | Onboard LSM6DS3 shares this bus (0x6A) |
+| A0 | FSR grip sensor (planned) | 3V3 → FSR → A0 → 10 kΩ → GND |
+| D2 | AT42QT1010 OUT (temporary) | Freed once the FSR is in |
+| D3 (PWM) | 1 kΩ → 2N4401 base → vibration motor | Motor from 3V3 to collector, diode across it (stripe toward 3V3) |
+| D4 | 1 kΩ → 2N4401 base → active buzzer | Buzzer + leg to 3V3, − leg to collector |
+| D5 / D6 / D9 (PWM) | 220 Ω → RGB LED red / green / blue | Common cathode to GND |
+| VIN | 9 V battery + (through the switch) | Battery − to GND |
+
+Free: D7, D8, D10–D12, A1–A3, A6, A7. Avoid D0/D1 (Serial1) and D13 (onboard LED).
+
 ## Wiring: grip touch sensor (Adafruit AT42QT1010 breakout)
 
 | Touch board pin | Nano 33 IoT pin |

@@ -1,0 +1,232 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 780" width="1200" height="780" font-family="Helvetica, Arial, sans-serif">
+  <defs>
+    <g id="gnd">
+      <line x1="0" y1="0" x2="0" y2="10" stroke="#1e293b" stroke-width="2"/>
+      <line x1="-12" y1="10" x2="12" y2="10" stroke="#1e293b" stroke-width="2"/>
+      <line x1="-8" y1="15" x2="8" y2="15" stroke="#1e293b" stroke-width="2"/>
+      <line x1="-4" y1="20" x2="4" y2="20" stroke="#1e293b" stroke-width="2"/>
+    </g>
+    <g id="v33">
+      <line x1="0" y1="0" x2="0" y2="10" stroke="#c0392b" stroke-width="2"/>
+      <line x1="-12" y1="0" x2="12" y2="0" stroke="#c0392b" stroke-width="2.5"/>
+      <text x="0" y="-6" text-anchor="middle" font-size="13" font-weight="bold" fill="#c0392b">3V3</text>
+    </g>
+  </defs>
+
+  <rect width="1200" height="780" fill="#ffffff"/>
+
+  <!-- Title -->
+  <text x="40" y="42" font-size="24" font-weight="bold" fill="#0f172a">WALKASSIST wiring: Arduino Nano 33 IoT</text>
+  <text x="40" y="66" font-size="14" fill="#475569">Everything runs at 3.3 V. Dashed = temporary part. Red = 3.3 V, blue = signals, black = ground.</text>
+
+  <!-- ============================ Nano 33 IoT ============================ -->
+  <rect x="470" y="170" width="260" height="460" rx="10" fill="#e0f2fe" stroke="#0369a1" stroke-width="2.5"/>
+  <text x="600" y="194" text-anchor="middle" font-size="16" font-weight="bold" fill="#0c4a6e">Arduino Nano 33 IoT</text>
+  <!-- left pins -->
+  <g font-size="14" fill="#0f172a">
+    <text x="480" y="215">3V3</text>
+    <text x="480" y="255">GND</text>
+    <text x="480" y="305">A4 (SDA)</text>
+    <text x="480" y="345">A5 (SCL)</text>
+    <text x="480" y="405">A0 (analog)</text>
+    <text x="480" y="535">D2</text>
+    <text x="480" y="595">VIN</text>
+  </g>
+  <!-- right pins -->
+  <g font-size="14" fill="#0f172a" text-anchor="end">
+    <text x="720" y="255">D3 (PWM)</text>
+    <text x="720" y="355">D5 (PWM)</text>
+    <text x="720" y="390">D6 (PWM)</text>
+    <text x="720" y="425">D9 (PWM)</text>
+    <text x="720" y="535">D4</text>
+  </g>
+  <g font-size="12.5" fill="#334155" text-anchor="middle">
+    <text x="600" y="455">Onboard LSM6DS3 IMU</text>
+    <text x="600" y="472">(handle) on I2C, 0x6A</text>
+    <text x="600" y="496">Orange LED (D13)</text>
+    <text x="600" y="513">mirrors the grip</text>
+  </g>
+  <!-- pin stubs -->
+  <g fill="#0f172a">
+    <circle cx="470" cy="210" r="3.5"/><circle cx="470" cy="250" r="3.5"/><circle cx="470" cy="300" r="3.5"/>
+    <circle cx="470" cy="340" r="3.5"/><circle cx="470" cy="400" r="3.5"/><circle cx="470" cy="530" r="3.5"/>
+    <circle cx="470" cy="590" r="3.5"/>
+    <circle cx="730" cy="250" r="3.5"/><circle cx="730" cy="350" r="3.5"/><circle cx="730" cy="385" r="3.5"/>
+    <circle cx="730" cy="420" r="3.5"/><circle cx="730" cy="530" r="3.5"/>
+  </g>
+
+  <!-- ============================ Tip IMU ============================ -->
+  <rect x="60" y="180" width="230" height="180" rx="8" fill="#f8fafc" stroke="#334155" stroke-width="2"/>
+  <text x="72" y="204" font-size="15" font-weight="bold" fill="#0f172a">MPU-6050 (GY-521)</text>
+  <text x="72" y="224" font-size="12.5" fill="#475569">Tip IMU, I2C 0x68</text>
+  <text x="72" y="241" font-size="12.5" fill="#475569">~1.2 m cable down</text>
+  <text x="72" y="257" font-size="12.5" fill="#475569">the shaft</text>
+  <text x="72" y="328" font-size="12" fill="#64748b">AD0, INT, XDA, XCL:</text>
+  <text x="72" y="345" font-size="12" fill="#64748b">leave unconnected</text>
+  <g font-size="13" fill="#0f172a" text-anchor="end">
+    <text x="282" y="214">VCC</text>
+    <text x="282" y="254">GND</text>
+    <text x="282" y="304">SDA</text>
+    <text x="282" y="344">SCL</text>
+  </g>
+  <line x1="290" y1="210" x2="470" y2="210" stroke="#c0392b" stroke-width="2.5"/>
+  <line x1="290" y1="250" x2="470" y2="250" stroke="#1e293b" stroke-width="2.5"/>
+  <line x1="290" y1="300" x2="470" y2="300" stroke="#2563eb" stroke-width="2.5"/>
+  <line x1="290" y1="340" x2="470" y2="340" stroke="#2563eb" stroke-width="2.5"/>
+
+  <!-- ============================ Grip FSR (planned) ============================ -->
+  <text x="60" y="378" font-size="13" font-weight="bold" fill="#0f172a">Grip FSR (planned): square FSR + 10 kΩ</text>
+  <text x="62" y="405" font-size="13" font-weight="bold" fill="#c0392b">3V3</text>
+  <line x1="94" y1="400" x2="160" y2="400" stroke="#c0392b" stroke-width="2.5"/>
+  <rect x="160" y="391" width="80" height="18" fill="#ffffff" stroke="#1e293b" stroke-width="2"/>
+  <line x1="172" y1="414" x2="230" y2="388" stroke="#1e293b" stroke-width="1.5"/>
+  <polygon points="232,387 222,388 226,395" fill="#1e293b"/>
+  <text x="200" y="430" text-anchor="middle" font-size="12" fill="#475569">FSR</text>
+  <line x1="240" y1="400" x2="470" y2="400" stroke="#2563eb" stroke-width="2.5"/>
+  <circle cx="360" cy="400" r="4" fill="#1e293b"/>
+  <line x1="360" y1="400" x2="360" y2="412" stroke="#1e293b" stroke-width="2"/>
+  <rect x="352" y="412" width="16" height="40" fill="#ffffff" stroke="#1e293b" stroke-width="2"/>
+  <text x="376" y="437" font-size="12" fill="#475569">10 kΩ</text>
+  <line x1="360" y1="452" x2="360" y2="462" stroke="#1e293b" stroke-width="2"/>
+  <use href="#gnd" x="360" y="462"/>
+  <text x="62" y="455" font-size="12" fill="#64748b">Press harder → higher</text>
+  <text x="62" y="471" font-size="12" fill="#64748b">voltage on A0</text>
+
+  <!-- ============================ Touch board (temporary) ============================ -->
+  <rect x="60" y="500" width="230" height="74" rx="8" fill="#f8fafc" stroke="#334155" stroke-width="2" stroke-dasharray="7 5"/>
+  <text x="72" y="519" font-size="13.5" font-weight="bold" fill="#0f172a">AT42QT1010 touch</text>
+  <text x="72" y="545" font-size="12" fill="#475569">VIN → 3V3, GND → GND</text>
+  <text x="72" y="563" font-size="12" fill="#475569">Temporary: drops after ~20 s</text>
+  <line x1="290" y1="530" x2="470" y2="530" stroke="#2563eb" stroke-width="2.5" stroke-dasharray="7 5"/>
+  <text x="300" y="523" font-size="12" fill="#475569">OUT</text>
+
+  <!-- ============================ Power ============================ -->
+  <rect x="60" y="630" width="140" height="74" rx="8" fill="#fefce8" stroke="#a16207" stroke-width="2"/>
+  <text x="130" y="662" text-anchor="middle" font-size="14" font-weight="bold" fill="#713f12">9 V battery</text>
+  <text x="130" y="682" text-anchor="middle" font-size="12" fill="#713f12">(+ spares)</text>
+  <text x="190" y="650" text-anchor="end" font-size="14" font-weight="bold" fill="#c0392b">+</text>
+  <text x="190" y="696" text-anchor="end" font-size="16" font-weight="bold" fill="#1e293b">−</text>
+  <!-- + to switch to VIN -->
+  <line x1="200" y1="645" x2="270" y2="645" stroke="#c0392b" stroke-width="2.5"/>
+  <circle cx="270" cy="645" r="4" fill="#ffffff" stroke="#1e293b" stroke-width="2"/>
+  <line x1="272" y1="643" x2="314" y2="628" stroke="#1e293b" stroke-width="2.5"/>
+  <circle cx="318" cy="645" r="4" fill="#ffffff" stroke="#1e293b" stroke-width="2"/>
+  <text x="294" y="620" text-anchor="middle" font-size="12" fill="#475569">on/off switch</text>
+  <line x1="322" y1="645" x2="420" y2="645" stroke="#c0392b" stroke-width="2.5"/>
+  <line x1="420" y1="645" x2="420" y2="590" stroke="#c0392b" stroke-width="2.5"/>
+  <line x1="420" y1="590" x2="470" y2="590" stroke="#c0392b" stroke-width="2.5"/>
+  <text x="345" y="666" font-size="12" fill="#c0392b">9 V → VIN only</text>
+  <!-- − to GND -->
+  <line x1="200" y1="690" x2="240" y2="690" stroke="#1e293b" stroke-width="2.5"/>
+  <use href="#gnd" x="240" y="690"/>
+
+  <!-- ============================ Vibration motor (D3) ============================ -->
+  <line x1="730" y1="250" x2="780" y2="250" stroke="#2563eb" stroke-width="2.5"/>
+  <rect x="780" y="242" width="60" height="16" fill="#ffffff" stroke="#1e293b" stroke-width="2"/>
+  <text x="810" y="236" text-anchor="middle" font-size="12" fill="#475569">1 kΩ</text>
+  <line x1="840" y1="250" x2="912" y2="250" stroke="#2563eb" stroke-width="2.5"/>
+  <!-- transistor Q1 at (925,250) -->
+  <circle cx="925" cy="250" r="24" fill="#ffffff" stroke="#1e293b" stroke-width="2"/>
+  <line x1="912" y1="236" x2="912" y2="264" stroke="#1e293b" stroke-width="3"/>
+  <line x1="912" y1="244" x2="938" y2="228" stroke="#1e293b" stroke-width="2"/>
+  <line x1="912" y1="256" x2="938" y2="272" stroke="#1e293b" stroke-width="2"/>
+  <polygon points="938,272 928,270 933,263" fill="#1e293b"/>
+  <text x="956" y="262" font-size="12" fill="#475569">Q1 2N4401</text>
+  <!-- collector up to motor -->
+  <line x1="938" y1="228" x2="938" y2="203" stroke="#1e293b" stroke-width="2"/>
+  <circle cx="938" cy="185" r="18" fill="#fff7ed" stroke="#1e293b" stroke-width="2"/>
+  <text x="938" y="190" text-anchor="middle" font-size="15" font-weight="bold" fill="#0f172a">M</text>
+  <line x1="938" y1="167" x2="938" y2="160" stroke="#c0392b" stroke-width="2"/>
+  <use href="#v33" x="938" y="150"/>
+  <circle cx="938" cy="160" r="3.5" fill="#1e293b"/>
+  <circle cx="938" cy="222" r="3.5" fill="#1e293b"/>
+  <text x="912" y="180" text-anchor="end" font-size="13" font-weight="bold" fill="#0f172a">Vibration</text>
+  <text x="912" y="196" text-anchor="end" font-size="13" font-weight="bold" fill="#0f172a">motor</text>
+  <!-- flyback diode, cathode (bar) toward 3V3 -->
+  <line x1="938" y1="160" x2="1010" y2="160" stroke="#c0392b" stroke-width="2"/>
+  <line x1="1010" y1="160" x2="1010" y2="188" stroke="#1e293b" stroke-width="2"/>
+  <line x1="1000" y1="188" x2="1020" y2="188" stroke="#1e293b" stroke-width="3"/>
+  <polygon points="1010,189 1000,207 1020,207" fill="#1e293b"/>
+  <line x1="1010" y1="207" x2="1010" y2="222" stroke="#1e293b" stroke-width="2"/>
+  <line x1="1010" y1="222" x2="938" y2="222" stroke="#1e293b" stroke-width="2"/>
+  <text x="1030" y="196" font-size="12" fill="#475569">Diode, stripe</text>
+  <text x="1030" y="212" font-size="12" fill="#475569">toward 3V3</text>
+  <!-- emitter to ground -->
+  <line x1="938" y1="272" x2="938" y2="290" stroke="#1e293b" stroke-width="2"/>
+  <use href="#gnd" x="938" y="290"/>
+
+  <!-- ============================ RGB LED (D5, D6, D9) ============================ -->
+  <text x="810" y="336" text-anchor="middle" font-size="12" fill="#475569">220 Ω each</text>
+  <g stroke-width="2.5">
+    <line x1="730" y1="350" x2="780" y2="350" stroke="#2563eb"/>
+    <line x1="730" y1="385" x2="780" y2="385" stroke="#2563eb"/>
+    <line x1="730" y1="420" x2="780" y2="420" stroke="#2563eb"/>
+  </g>
+  <g fill="#ffffff" stroke="#1e293b" stroke-width="2">
+    <rect x="780" y="342" width="60" height="16"/>
+    <rect x="780" y="377" width="60" height="16"/>
+    <rect x="780" y="412" width="60" height="16"/>
+  </g>
+  <g stroke="#1e293b" stroke-width="2">
+    <line x1="840" y1="350" x2="880" y2="350"/>
+    <line x1="840" y1="385" x2="880" y2="385"/>
+    <line x1="840" y1="420" x2="880" y2="420"/>
+    <line x1="902" y1="350" x2="960" y2="350"/>
+    <line x1="902" y1="385" x2="960" y2="385"/>
+    <line x1="902" y1="420" x2="960" y2="420"/>
+    <line x1="960" y1="350" x2="960" y2="420"/>
+    <line x1="960" y1="420" x2="1040" y2="420"/>
+  </g>
+  <!-- LED symbols -->
+  <polygon points="880,340 880,360 902,350" fill="#ef4444" stroke="#1e293b" stroke-width="1.5"/>
+  <line x1="902" y1="340" x2="902" y2="360" stroke="#1e293b" stroke-width="3"/>
+  <polygon points="880,375 880,395 902,385" fill="#22c55e" stroke="#1e293b" stroke-width="1.5"/>
+  <line x1="902" y1="375" x2="902" y2="395" stroke="#1e293b" stroke-width="3"/>
+  <polygon points="880,410 880,430 902,420" fill="#3b82f6" stroke="#1e293b" stroke-width="1.5"/>
+  <line x1="902" y1="410" x2="902" y2="430" stroke="#1e293b" stroke-width="3"/>
+  <g font-size="12" font-weight="bold" fill="#0f172a">
+    <text x="912" y="344">R</text>
+    <text x="912" y="379">G</text>
+    <text x="912" y="414">B</text>
+  </g>
+  <circle cx="960" cy="385" r="3.5" fill="#1e293b"/>
+  <circle cx="960" cy="420" r="3.5" fill="#1e293b"/>
+  <text x="975" y="370" font-size="13" font-weight="bold" fill="#0f172a">RGB LED</text>
+  <text x="975" y="387" font-size="12" fill="#475569">common cathode</text>
+  <text x="975" y="403" font-size="12" fill="#475569">(longest leg → GND)</text>
+  <use href="#gnd" x="1040" y="420"/>
+
+  <!-- ============================ Buzzer (D4) ============================ -->
+  <line x1="730" y1="530" x2="780" y2="530" stroke="#2563eb" stroke-width="2.5"/>
+  <rect x="780" y="522" width="60" height="16" fill="#ffffff" stroke="#1e293b" stroke-width="2"/>
+  <text x="810" y="516" text-anchor="middle" font-size="12" fill="#475569">1 kΩ</text>
+  <line x1="840" y1="530" x2="912" y2="530" stroke="#2563eb" stroke-width="2.5"/>
+  <!-- transistor Q2 at (925,530) -->
+  <circle cx="925" cy="530" r="24" fill="#ffffff" stroke="#1e293b" stroke-width="2"/>
+  <line x1="912" y1="516" x2="912" y2="544" stroke="#1e293b" stroke-width="3"/>
+  <line x1="912" y1="524" x2="938" y2="508" stroke="#1e293b" stroke-width="2"/>
+  <line x1="912" y1="536" x2="938" y2="552" stroke="#1e293b" stroke-width="2"/>
+  <polygon points="938,552 928,550 933,543" fill="#1e293b"/>
+  <text x="956" y="545" font-size="12" fill="#475569">Q2 2N4401</text>
+  <line x1="938" y1="508" x2="938" y2="497" stroke="#1e293b" stroke-width="2"/>
+  <rect x="918" y="465" width="40" height="32" rx="4" fill="#fff7ed" stroke="#1e293b" stroke-width="2"/>
+  <text x="938" y="486" text-anchor="middle" font-size="12" font-weight="bold" fill="#0f172a">BZ</text>
+  <text x="926" y="476" text-anchor="middle" font-size="10" fill="#c0392b">+</text>
+  <line x1="938" y1="465" x2="938" y2="458" stroke="#c0392b" stroke-width="2"/>
+  <use href="#v33" x="938" y="448"/>
+  <text x="972" y="480" font-size="13" font-weight="bold" fill="#0f172a">Active buzzer</text>
+  <text x="972" y="496" font-size="12" fill="#475569">+ leg toward 3V3</text>
+  <line x1="938" y1="552" x2="938" y2="575" stroke="#1e293b" stroke-width="2"/>
+  <use href="#gnd" x="938" y="575"/>
+
+  <!-- ============================ Pin budget ============================ -->
+  <rect x="760" y="625" width="410" height="132" rx="8" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5"/>
+  <text x="776" y="650" font-size="14" font-weight="bold" fill="#0f172a">Pin budget: 9 used, plenty free</text>
+  <g font-size="12.5" fill="#334155">
+    <text x="776" y="672">Used: A4, A5 (I2C) · A0 (FSR) · D2 (touch, temporary)</text>
+    <text x="776" y="690">D3 (motor) · D4 (buzzer) · D5, D6, D9 (LED) · VIN</text>
+    <text x="776" y="712">Free: D7, D8, D10, D11, D12, A1, A2, A3, A6, A7</text>
+    <text x="776" y="730">Avoid: D0/D1 (Serial1), D13 (onboard LED)</text>
+    <text x="776" y="748">Once the FSR replaces the touch board, D2 is free too.</text>
+  </g>
+</svg>
