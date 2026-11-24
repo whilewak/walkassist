@@ -1,12 +1,49 @@
 # WALKASSIST firmware
 
 Board: **Arduino Nano 33 IoT** (Arduino IDE → Boards Manager → "Arduino SAMD Boards").
-No extra libraries are needed for the IMU sketches.
+No libraries need installing. Shared drivers live in `libraries/WalkAssist/`
+(`cane_imu.h`, `cane_touch.h`); `tools/arduino.sh` and the VS Code tasks pass
+that folder to the compiler. In the Arduino IDE, copy or symlink
+`libraries/WalkAssist` into `~/Documents/Arduino/libraries/` instead.
 
 | Sketch | What it does |
 |---|---|
 | `i2c_scan/` | Lists every I2C device. Run this first to check the wiring. |
-| `imu_logger/` | Reads both IMUs at 100 Hz and streams CSV over USB. |
+| `touch_test/` | Grip sensor test: touches, gestures, and the 2-minute hold test. |
+| `imu_logger/` | Reads both IMUs and the grip sensor at 100 Hz and streams CSV over USB. |
+
+## Wiring: grip touch sensor (Adafruit AT42QT1010 breakout)
+
+| Touch board pin | Nano 33 IoT pin |
+|---|---|
+| VIN | 3.3V |
+| GND | GND |
+| OUT | **D2** |
+
+- Don't touch the pad while powering up; the chip calibrates at power-on.
+- The Nano's orange LED lights while the sensor reads "touched" (both sketches).
+- To sense through the cane grip, wire the board's pad to copper tape or a
+  conductive sheet wrapped around the grip.
+- The SparkFun SEN-12041 uses the same AT42QT1010 chip and wires the same way: VDD → 3.3V, GND, OUT → D2.
+- **The AT42QT1010 drops its output after ~60 s of continuous touch** (it recalibrates; datasheet §3.3). Run the hold test below.
+
+### Gestures
+
+The hand leaves the grip, then taps (each tap under 0.35 s, gaps under 0.45 s):
+
+| Gesture | Meaning |
+|---|---|
+| Double tap | Cancel / "I'm OK" / accept baseline |
+| Triple tap | Re-calibrate |
+
+A long press isn't used: holding the cane while walking already looks like one.
+Timing constants are at the top of `cane_touch.h`.
+
+### Hold test
+
+Upload `touch_test`, grip the sensor and keep holding for 2+ minutes. A
+`still held` line prints every 10 s. If `UP` appears while your hand is still
+on it, the chip recalibrated during the long touch; note after how long.
 
 ## Wiring: tip IMU (MPU-6050 / GY-521 board)
 
@@ -47,7 +84,11 @@ python3 tools/plot_session.py data/normal_walk_<timestamp>.csv
 | `p` | Plotter mode (labeled accelerations) |
 | `v` | CSV mode (default) |
 | `h` | Print the CSV header |
-| `s` | Status: which IMUs answered, read errors |
+| `s` | Status: which IMUs answered, grip state, read errors |
+
+CSV columns: `t_ms`, handle `h_ax…h_gz`, tip `t_ax…t_gz`, `h_ok`, `t_ok`,
+`touch` (1 = gripped), `gesture` (2 = double tap, 3 = triple tap, on the
+sample where it finished). `log_serial.py` adds `mark` for Enter presses.
 
 ## If the tip IMU isn't found
 

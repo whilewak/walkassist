@@ -1,13 +1,16 @@
-// WALKASSIST - read both IMUs at 100 Hz and stream them over USB.
+// WALKASSIST - read both IMUs and the grip sensor at 100 Hz and stream them over USB.
 //
 // Handle IMU = LSM6DS3 on the Nano 33 IoT. Tip IMU = MPU-6050 over I2C.
+// Grip = AT42QT1010 touch breakout, OUT on D2.
 // Open Serial Monitor / Plotter at 115200 baud, or record with tools/log_serial.py.
 //
 // Output (lines starting with '#' are status messages, not data):
 //   CSV mode (default):
-//     t_ms,h_ax,h_ay,h_az,h_gx,h_gy,h_gz,t_ax,t_ay,t_az,t_gx,t_gy,t_gz,h_ok,t_ok
+//     t_ms,h_ax,h_ay,h_az,h_gx,h_gy,h_gz,t_ax,t_ay,t_az,t_gx,t_gy,t_gz,h_ok,t_ok,touch,gesture
 //     h_ = handle IMU, t_ = tip IMU, acceleration in g, rotation in deg/s,
-//     *_ok = 1 if that IMU was read this sample, 0 if not.
+//     *_ok = 1 if that IMU was read this sample, 0 if not,
+//     touch = 1 while the grip is touched, gesture = 2 (double tap) or
+//     3 (triple tap) on the sample where a gesture finished, else 0.
 //   Plotter mode: accelerations only, labeled for the Arduino IDE Serial Plotter.
 //
 // Serial commands (type a letter, press Enter):
@@ -16,8 +19,10 @@
 //   p  plotter mode      v  CSV mode      s  status
 
 #include <Wire.h>
-#include "imu.h"
+#include <cane_imu.h>
+#include <cane_touch.h>
 
+const uint8_t TOUCH_PIN = 2;
 const uint32_t SAMPLE_PERIOD_US = 10000;  // 100 Hz
 const uint32_t I2C_CLOCK_HZ = 100000;     // 100 kHz: reliable over a long cable
 const uint8_t TIP_FAILS_BEFORE_LOST = 10; // consecutive failed reads
@@ -28,8 +33,10 @@ OutputMode mode = MODE_CSV;
 
 Lsm6ds3 handleImu;
 Mpu6050 tipImu;
+TouchSensor touch;
 bool handleOk = false;
 bool tipOk = false;
+Gesture pendingGesture = GESTURE_NONE;  // reported on the next sample
 
 float handleBias[3] = {0, 0, 0};  // gyro bias, deg/s
 float tipBias[3] = {0, 0, 0};
@@ -48,6 +55,8 @@ void setup() {
 
   Wire.begin();
   Wire.setClock(I2C_CLOCK_HZ);
+  touch.begin(TOUCH_PIN);
+  pinMode(LED_BUILTIN, OUTPUT);  // mirrors the grip sensor
 
   handleOk = handleImu.begin();
   tipOk = tipImu.begin();
@@ -61,6 +70,16 @@ void setup() {
 // ------------------------------------------------------------------- loop --
 void loop() {
   handleSerialCommands();
+
+  // The touch sensor is checked every pass (not only every 10 ms) so tap
+  // timing is accurate. A finished gesture waits for the next sample.
+  Gesture g = touch.update();
+  if (g != GESTURE_NONE) {
+    pendingGesture = g;
+    Serial.print("# gesture: ");
+    Serial.println(gestureName(g));
+  }
+  digitalWrite(LED_BUILTIN, touch.touched() ? HIGH : LOW);
 
   // Wait for the next 10 ms tick without blocking.
   if ((int32_t)(micros() - nextSampleUs) < 0) return;
@@ -82,7 +101,8 @@ void loop() {
   if (tRead) removeBias(t, tipBias);
 
   if (mode == MODE_CSV) {
-    printCsv(tMs, h, t, hRead, tRead);
+    printCsv(tMs, h, t, hRead, tRead, touch.touched(), pendingGesture);
+    pendingGesture = GESTURE_NONE;
   } else {
     printPlotter(h, t);
   }
@@ -161,7 +181,8 @@ void removeBias(ImuSample& s, const float bias[3]) {
 
 // ----------------------------------------------------------------- output --
 void printHeader() {
-  Serial.println("t_ms,h_ax,h_ay,h_az,h_gx,h_gy,h_gz,t_ax,t_ay,t_az,t_gx,t_gy,t_gz,h_ok,t_ok");
+  Serial.println("t_ms,h_ax,h_ay,h_az,h_gx,h_gy,h_gz,t_ax,t_ay,t_az,t_gx,t_gy,t_gz,"
+                 "h_ok,t_ok,touch,gesture");
 }
 
 void printSample(const ImuSample& s) {
@@ -173,12 +194,15 @@ void printSample(const ImuSample& s) {
   Serial.print(s.gz, 2); Serial.print(',');
 }
 
-void printCsv(uint32_t tMs, const ImuSample& h, const ImuSample& t, bool hRead, bool tRead) {
+void printCsv(uint32_t tMs, const ImuSample& h, const ImuSample& t, bool hRead, bool tRead,
+              bool touched, Gesture g) {
   Serial.print(tMs); Serial.print(',');
   printSample(h);
   printSample(t);
   Serial.print(hRead ? 1 : 0); Serial.print(',');
-  Serial.println(tRead ? 1 : 0);
+  Serial.print(tRead ? 1 : 0); Serial.print(',');
+  Serial.print(touched ? 1 : 0); Serial.print(',');
+  Serial.println((int)g);
 }
 
 void printPlotter(const ImuSample& h, const ImuSample& t) {
@@ -187,7 +211,8 @@ void printPlotter(const ImuSample& h, const ImuSample& t) {
   Serial.print(",h_az:"); Serial.print(h.az, 3);
   Serial.print(",t_ax:"); Serial.print(t.ax, 3);
   Serial.print(",t_ay:"); Serial.print(t.ay, 3);
-  Serial.print(",t_az:"); Serial.println(t.az, 3);
+  Serial.print(",t_az:"); Serial.print(t.az, 3);
+  Serial.print(",touch:"); Serial.println(touch.touched() ? 1 : 0);
 }
 
 void printTriple(const float v[3]) {
@@ -206,6 +231,9 @@ void printStatus() {
   Serial.print(tipOk ? "OK" : "NOT FOUND (check wiring)");
   Serial.print(", WHO_AM_I=0x");
   Serial.println(tipImu.whoAmI, HEX);
+
+  Serial.print("# grip sensor (D2): ");
+  Serial.println(touch.touched() ? "touched" : "not touched");
 
   Serial.print("# tip read errors: ");
   Serial.print(tipReadErrors);

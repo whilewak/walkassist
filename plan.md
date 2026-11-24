@@ -6,12 +6,12 @@ A smart cane that warns users before a fall by comparing their walking to their 
 
 | Topic | Decision |
 |---|---|
-| Inputs | Capacitive touch on the grip + 2 IMUs (onboard LSM6DS3 at the handle, second IMU near the tip over I2C) |
+| Inputs | Grip sensor (capacitive touch for now → **FSR pressure sensor**, see 1.4) + 2 IMUs (onboard LSM6DS3 at the handle, second IMU near the tip over I2C) |
 | Outputs | Vibration motor (in-hand cues), RGB LED (status), **active buzzer** (fall alarm, locator) |
 | Phone link | **WiFi access point** hosted by the Nano: the phone joins the cane's network and opens a status page. No app, no internet, works on any phone. (The Nano can't run WiFi and BLE at the same time, so we use one.) |
 | Power | **9 V battery** → Nano VIN (accepts ~4.5–21 V). Motor, LED, buzzer run from the Nano's 3.3 V pin through transistors. |
 | Baseline | 5-min calibration walk (30–60 s in **demo mode**), user confirms it, then slow updates during stable walking; saved to flash at the end of each walk |
-| Gestures | **Double tap** = cancel / "I'm OK" / accept baseline · **Long press (2 s)** = re-calibrate. No SOS. |
+| Gestures | **Double tap** = cancel / "I'm OK" / accept baseline · **Triple tap** = re-calibrate. No SOS. (A long press can't work: gripping the cane while walking already looks like one.) |
 | Processing | No ML. Per-step features + z-scores on the fly; only the last ~30 **steps** kept in RAM. All sensing, scoring and alerts run on the cane. |
 
 ---
@@ -23,8 +23,8 @@ A smart cane that warns users before a fall by comparing their walking to their 
 | Part | Role |
 |---|---|
 | MPU-6050 (6-DOF) | IMU #2 near the tip (I2C `0x68`) |
-| Adafruit AT42QT1010 capacitive touch breakout | Grip sensor (main) |
-| SparkFun SEN-12041 (AT42QT1011) capacitive touch breakout | Spare grip sensor |
+| Adafruit AT42QT1010 capacitive touch breakout | Grip sensor for now (drops output after ~20 s of touch; to be replaced by an FSR, see 1.4) |
+| SparkFun SEN-12041 capacitive touch breakout (same AT42QT1010 chip) | Spare grip sensor |
 | Active buzzer | Audio output |
 | 9 V battery with wires | Power → Nano VIN |
 | Adafruit 9-DOF (L3GD20H + LSM303) | Backup tip IMU if the MPU-6050 fails |
@@ -70,10 +70,20 @@ Pulse sensor, TMP36 temperature sensor, APDS-9960, sound impact sensor, ADXL335,
 - [ ] **Test early with the full ~1.2 m wire.** If reads fail: keep I2C at 100 kHz (or lower), twist SDA and SCL each with a GND wire, keep away from the motor wires.
 
 ### 1.4 Touch sensor + gestures
-- [ ] AT42QT1010 (Adafruit): VIN → 3.3 V, GND, OUT → D2 (HIGH when touched).
+- [x] AT42QT1010 (Adafruit): VIN → 3.3 V, GND, OUT → D2 (HIGH when touched). Wired and working with `touch_test`.
 - [ ] Test through the grip material; if it doesn't trigger, solder a wire from the board's pad to copper tape on the grip.
-- [ ] **Hold it for 2+ minutes.** These chips can recalibrate during a long touch and drop the output while still held. If that happens, treat a release with no motion change as "still held", or try the SparkFun AT42QT1011 board.
-- [ ] Gestures: **double tap** (two touches < 400 ms apart), **long press** (> 2 s). Make sure normal gripping while walking doesn't count as a tap.
+- [x] **Hold test (11/23): the AT42QT1010 drops its output after ~20 s of continuous touch** (measured 20.3 s and 22.7 s with the hand still on the pad).
+
+> **Limitation — AT42QT1010 can't sense a continuous grip.** The chip has a fixed "max on-duration": after a long touch it assumes the pad is blocked, recalibrates, and reports "not touched" until the hand lets go and touches again. The datasheet gives ~60 s in low-power mode; the Adafruit board ships in fast mode, which shortens it to the ~20 s we measured. No pin or jumper disables it.
+>
+> **Impact:** a user grips the cane for minutes while walking, so after ~20 s the cane thinks it was released. That breaks the grip + motion rules (Phase 5): a real fall would look like "released before impact" → dropped-cane chirp instead of the fall alarm, and walking can look like "carried". Taps and short touches still work.
+>
+> **Plan:** keep the current touch code for now; replace the grip sensor with an **FSR** (inventory: square Alpha MF02A-N-221-A01, or round MF01A-N-221-A01, + 10 kΩ resistor to an analog pin). An FSR has no timeout and also measures how hard the user leans on the cane. Only `touched()` changes (pressure above a threshold); the tap-gesture logic stays.
+
+- [ ] Get the FSR (square preferred) and switch the grip sensor; re-run the hold test.
+- [ ] Update the proposal: "capacitive touch sensor" → "grip pressure sensor (FSR)".
+- [x] Gestures in code (`firmware/libraries/WalkAssist/cane_touch.h`): **double tap** and **triple tap** (each tap < 350 ms, gaps < 450 ms). Simulated sequences pass, including regripping and brief releases while walking.
+- [ ] Try the gestures on the real grip; tune the timing constants if needed.
 
 ### 1.5 Outputs
 - [ ] **Vibration motor:** D3 → 1 kΩ → 2N2222 base; emitter → GND; motor between 3.3 V and collector; 1N4148 across the motor (stripe toward 3.3 V). Test PWM strength and patterns.
@@ -113,7 +123,7 @@ Pulse sensor, TMP36 temperature sensor, APDS-9960, sound impact sensor, ADXL335,
   - [ ] Cane laid down while still gripped (simulated fall)
   - [ ] Grip lost at impact, then re-gripped within 5 s
   - [ ] Cane carried, in a car / bag, leaned against a wall
-  - [ ] Double taps and long presses, while standing and while walking
+  - [ ] Double and triple taps, while standing and while walking
 - [ ] Mark events (key press or video timestamps) so the data can be labeled.
 
 ---
@@ -159,8 +169,8 @@ States: `WALKING`, `STANDING`, `CARRIED`, `PARKED`, `DROPPED`, `REGRIP_WAIT`, `F
 ## Phase 6 — Baseline and risk score (11/27 – 11/28)
 
 - [ ] **Calibration:** walk 5 min (demo mode: 30–60 s) → store mean and std of each feature.
-- [ ] **User confirms:** when calibration finishes, the cane gives a double haptic pulse; **double tap** to accept, **long press** to redo.
-- [ ] **Re-calibrate any time:** long press (while standing still, so it isn't triggered while walking).
+- [ ] **User confirms:** when calibration finishes, the cane gives a double haptic pulse; **double tap** to accept, **triple tap** to redo.
+- [ ] **Re-calibrate any time:** triple tap (accept it only while standing still, so it isn't triggered while walking).
 - [ ] **Adapt:** update mean/std slowly (exponential moving average) only while the score is green.
 - [ ] **Save** the baseline to flash after calibration and at the end of each walk (not continuously; flash wears out).
 - [ ] **Risk score 0–100:** weighted sum of each feature's z-score (weight stride-time variability most), clipped to 0–100.
@@ -232,10 +242,11 @@ States: `WALKING`, `STANDING`, `CARRIED`, `PARKED`, `DROPPED`, `REGRIP_WAIT`, `F
 |---|---|
 | Long I2C cable gives bad reads | Lower the clock, twist wires with GND, test early; move the Nano closer to the tip IMU; fall back to IMU 1 only |
 | False alarms from carrying or dropping | Tune grip + motion rules on the recordings |
-| Baseline learned during an unusual walk | User confirms at the end of calibration; long press re-calibrates |
-| Taps triggered by normal gripping | Require a release between taps; only accept long press while standing |
+| Baseline learned during an unusual walk | User confirms at the end of calibration; triple tap re-calibrates |
+| Taps triggered by normal gripping | Taps must be short touches after a release; accept triple tap only while standing |
 | 9 V battery runs low during the demo | Fresh battery + spares; parked → sleep |
 | Touch sensor doesn't work through the grip | Copper tape on the grip, or an FSR force sensor |
+| AT42QT1010 reports "released" after ~20 s of continuous grip (confirmed) | Replace with an FSR before Phase 5; until then, don't trust `touch` in recordings longer than ~20 s |
 | Absolute speed too noisy | Report speed only as a trend vs. baseline |
 | Motor vibration shows up in the handle IMU | Ignore IMU samples during motor pulses |
 | WiFi page fails at the demo | Cane works offline; show the summary over USB Serial |

@@ -15,6 +15,7 @@ set -euo pipefail
 FQBN="arduino:samd:nano_33_iot"
 BAUD=115200
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
+LIBS="$REPO/firmware/libraries"  # shared drivers (cane_imu.h, cane_touch.h)
 
 usage() {
   echo "usage: $0 compile|upload <sketch folder or file>" >&2
@@ -64,14 +65,15 @@ cmd="${1:-}"
 case "$cmd" in
   compile)
     dir="$(sketch_dir "${2:-}")"
-    arduino-cli compile --fqbn "$FQBN" --build-path "$REPO/.build/$(basename "$dir")" "$dir"
+    arduino-cli compile --fqbn "$FQBN" --libraries "$LIBS" \
+      --build-path "$REPO/.build/$(basename "$dir")" "$dir"
     ;;
   upload)
     dir="$(sketch_dir "${2:-}")"
     port="$(find_port)"
     echo "Uploading $(basename "$dir") to $port"
-    arduino-cli compile --fqbn "$FQBN" --build-path "$REPO/.build/$(basename "$dir")" \
-      --upload --port "$port" "$dir"
+    arduino-cli compile --fqbn "$FQBN" --libraries "$LIBS" \
+      --build-path "$REPO/.build/$(basename "$dir")" --upload --port "$port" "$dir"
     ;;
   monitor)
     port="$(find_port)"

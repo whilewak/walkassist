@@ -70,6 +70,8 @@ def main():
         threading.Thread(target=watch_enter, daemon=True).start()
 
         have_header = False
+        n_commas = 0
+        col = {}
         rows = 0
         tip_missing = 0
         last_report = time.time()
@@ -87,21 +89,27 @@ def main():
                     if not have_header:
                         f.write(line + ",mark\n")
                         have_header = True
+                        n_commas = line.count(",")
+                        col = {name: i for i, name in enumerate(line.split(","))}
                     continue
-                if not have_header or line.count(",") != 14:
+                if not have_header or line.count(",") != n_commas:
                     continue  # partial line or plotter output
 
                 with lock:
                     mark, pending_mark = pending_mark, 0
                 f.write(f"{line},{mark}\n")
                 rows += 1
-                if line.endswith(",0"):
+                fields = line.split(",")
+                if "t_ok" in col and fields[col["t_ok"]] == "0":
                     tip_missing += 1
 
                 now = time.time()
                 if now - last_report >= 2:
                     rate = (rows - rows_at_report) / (now - last_report)
-                    print(f"  {rows} rows, {rate:.0f} rows/s, tip IMU missing in {tip_missing}")
+                    grip = ""
+                    if "touch" in col:
+                        grip = ", grip touched" if fields[col["touch"]] == "1" else ", grip free"
+                    print(f"  {rows} rows, {rate:.0f} rows/s, tip IMU missing in {tip_missing}{grip}")
                     last_report, rows_at_report = now, rows
         except KeyboardInterrupt:
             pass

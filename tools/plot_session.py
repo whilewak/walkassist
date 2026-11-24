@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
-"""Plot a recorded session: acceleration and rotation for both IMUs.
+"""Plot a recorded session: acceleration and rotation for both IMUs, plus grip.
 
 Usage:
     python3 tools/plot_session.py data/normal_walk_20261123-140000.csv
 
 Markers (Enter presses during recording) are drawn as dashed vertical lines.
+Gestures are drawn as dots on the grip panel (2 = double tap, 3 = triple tap).
+Older recordings without the touch columns still plot.
 """
 
 import sys
@@ -17,21 +19,41 @@ def main():
     if len(sys.argv) != 2:
         sys.exit(__doc__)
     d = np.genfromtxt(sys.argv[1], delimiter=",", names=True)
+    names = d.dtype.names
     t = (d["t_ms"] - d["t_ms"][0]) / 1000.0
+    has_touch = "touch" in names
 
-    fig, axes = plt.subplots(4, 1, sharex=True, figsize=(12, 9))
     panels = [
         ("Handle acceleration (g)", "h_a"),
         ("Handle rotation (deg/s)", "h_g"),
         ("Tip acceleration (g)", "t_a"),
         ("Tip rotation (deg/s)", "t_g"),
     ]
+    n = len(panels) + (1 if has_touch else 0)
+    ratios = [3] * len(panels) + ([1] if has_touch else [])
+    fig, axes = plt.subplots(n, 1, sharex=True, figsize=(12, 10),
+                             gridspec_kw={"height_ratios": ratios})
+
     for ax, (title, prefix) in zip(axes, panels):
         for axis in "xyz":
             ax.plot(t, d[prefix + axis], label=axis, linewidth=0.8)
         ax.set_title(title, fontsize=10)
         ax.legend(loc="upper right", fontsize=8)
         ax.grid(alpha=0.3)
+
+    if has_touch:
+        ax = axes[-1]
+        ax.fill_between(t, d["touch"], step="post", alpha=0.4, label="touched")
+        if "gesture" in names:
+            g = d["gesture"] > 0
+            ax.scatter(t[g], np.full(g.sum(), 0.5), color="k", zorder=3, label="gesture")
+            for tx, code in zip(t[g], d["gesture"][g]):
+                ax.annotate("double" if code == 2 else "triple", (tx, 0.5),
+                            textcoords="offset points", xytext=(4, 4), fontsize=8)
+        ax.set_ylim(-0.1, 1.1)
+        ax.set_yticks([0, 1])
+        ax.set_title("Grip", fontsize=10)
+        ax.legend(loc="upper right", fontsize=8)
 
     for mt in t[d["mark"] > 0]:
         for ax in axes:
