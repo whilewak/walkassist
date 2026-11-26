@@ -2,7 +2,7 @@
 
 Board: **Arduino Nano 33 IoT** (Arduino IDE → Boards Manager → "Arduino SAMD Boards").
 No libraries need installing. Shared drivers live in `libraries/WalkAssist/`
-(`cane_imu.h`, `cane_touch.h`); `tools/arduino.sh` and the VS Code tasks pass
+(`cane_imu.h`, `cane_touch.h`, `cane_output.h`); `tools/arduino.sh` and the VS Code tasks pass
 that folder to the compiler. In the Arduino IDE, copy or symlink
 `libraries/WalkAssist` into `~/Documents/Arduino/libraries/` instead.
 
@@ -10,6 +10,7 @@ that folder to the compiler. In the Arduino IDE, copy or symlink
 |---|---|
 | `i2c_scan/` | Lists every I2C device. Run this first to check the wiring. |
 | `touch_test/` | Grip sensor (FSR) test: pressure readings, gestures, and the 2-minute hold test. |
+| `output_test/` | Every LED colour and buzzer pattern, by key or as a demo of each cane situation. |
 | `imu_logger/` | Reads both IMUs and the grip sensor at 100 Hz and streams CSV over USB. |
 
 ## Pin map
@@ -72,6 +73,51 @@ Upload `touch_test` and open the Serial Monitor:
 3. Try double and triple taps.
 4. Hold for 2+ minutes: `still held` prints every 10 s with the pressure, and
    `UP` should appear only when you let go.
+
+## Outputs: LED and buzzer patterns (`cane_output.h`)
+
+Wiring: buzzer driver on **D4** (1 kΩ → 2N4401, buzzer + to 3V3), RGB LED on
+**D5 / D6 / D9** through 220 Ω, common leg to GND (see `docs/circuit.svg`).
+
+Each output has a **background** pattern that loops until changed and a
+**one-shot** that plays on top, then the background carries on. `update()`
+never blocks, so sensing keeps running.
+
+| Sound | Pattern | Meaning |
+|---|---|---|
+| `ACK` | one 40 ms chirp | gesture acknowledged |
+| `CONFIRM` | two 80 ms beeps | calibration done / accepted |
+| `SLIP` | one 60 ms beep | tip slip |
+| `NEAR_FALL` | three quick 60 ms beeps | stumble |
+| `REST` | double beep every 4 s | fatigue: take a rest |
+| `STOP_REST` | three firm beeps, pause, repeat | high risk: stop and rest |
+| `LOCATOR` | two chirps every 2 s | dropped cane: find me |
+| `COUNTDOWN` | 15 s of beeps speeding up (1 s → 0.25 s apart) | fall detected: double tap to cancel |
+| `ALARM` | continuous | fall not cancelled |
+| `RHYTHM` | 25 ms tick every N ms (`setRhythm(N)`) | unsteady gait: tick at the user's cadence |
+
+| Light | Meaning |
+|---|---|
+| `GREEN` | stable |
+| `AMBER` / `AMBER_FLASH` | rising risk / warning |
+| `RED` / `RED_FLASH` | high risk / fall |
+| `LOCATE` (white blinking) | dropped cane: find me |
+| `WHITE` (short flash) | acknowledgement |
+
+```cpp
+#include <cane_output.h>
+CaneOutput out;
+out.begin();                          // D4 buzzer, D5/D6/D9 LED (common cathode)
+out.setLight(Light::AMBER);           // background light
+out.setRhythm(900);                   // background sound: tick every 900 ms
+out.playBeep(Beep::NEAR_FALL);        // one-shot on top, rhythm carries on after
+out.update();                         // every loop
+```
+
+**Test:** upload `output_test`, open the Serial Monitor and type `d` for a demo
+of every situation (6 s each), or single keys (listed at startup) to try each
+sound and colour. The Nano's orange LED blinks steadily the whole time to show
+nothing blocks. Common-anode LED: set `COMMON_ANODE = true` in the sketch.
 
 ## Wiring: tip IMU (MPU-6050 / GY-521 board)
 

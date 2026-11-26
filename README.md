@@ -9,7 +9,8 @@ A smart cane that warns users before a fall by comparing their walking to their 
 | Dev setup: arduino-cli + VS Code tasks, git repo | Wire the round FSR and tune its threshold with `touch_test` (1.4) |
 | Both IMUs read together at 100 Hz (`imu_logger`) | Zip-tie the box on, mount the tip IMU and its cable (Phase 2) |
 | Grip code for the **round FSR on A0** + double/triple tap gestures, grip pressure logged | Record labeled walks (Phase 3) |
-| Laptop recorder + plotter (`tools/`) | Solder the LED and buzzer-driver assemblies, test them (1.5) |
+| Laptop recorder + plotter (`tools/`) | Solder the LED and buzzer-driver assemblies, test them with `output_test` (1.5) |
+| LED + buzzer pattern library (`cane_output.h`) and `output_test` | |
 | Clamp box designed (`cad/`), **printed**, test-fitted on the cane with the Nano, breadboard and battery | |
 | Breadboard wiring diagram (`docs/circuit.svg`) | |
 
@@ -32,10 +33,11 @@ Critical path: **mount → record → gait analysis**. Outputs can happen in par
 
 | Path | What it is |
 |---|---|
-| `firmware/libraries/WalkAssist/` | Shared drivers: `cane_imu.h` (LSM6DS3, MPU-6050), `cane_touch.h` (FSR grip + gestures) |
+| `firmware/libraries/WalkAssist/` | Shared drivers: `cane_imu.h` (LSM6DS3, MPU-6050), `cane_touch.h` (FSR grip + gestures), `cane_output.h` (LED + buzzer patterns) |
 | `firmware/i2c_scan/` | Lists I2C devices (wiring check) |
 | `firmware/imu_logger/` | Streams both IMUs + grip (pressed, gesture, pressure) as CSV at 100 Hz |
 | `firmware/touch_test/` | Grip (FSR) test: pressure readings, gestures, hold test |
+| `firmware/output_test/` | Every LED colour and buzzer pattern, plus a demo of each cane situation |
 | `firmware/README.md` | Pin map, wiring, how to run the sketches |
 | `tools/arduino.sh` | Compile / upload / monitor (used by the VS Code tasks) |
 | `tools/log_serial.py`, `tools/plot_session.py` | Record labeled sessions to `data/`, plot them |
@@ -117,7 +119,9 @@ Pulse sensor, TMP36 temperature sensor, APDS-9960, sound impact sensor, ADXL335,
 The breadboard has no spare rows for these, so each is a small soldered assembly with wires that plug in next to its pin (dashed boxes in `docs/circuit.svg`).
 - [ ] **Active buzzer driver:** 2N4401 (flat side facing you: E-B-C). 1 kΩ on the base → wire to **D4**; buzzer − on the collector, buzzer + → **3V3**; emitter → **GND** (right). On/off only; vary the **beep timing** to tell sounds apart (soft ticks = rhythm cue, short chirps = locator, fast continuous = alarm).
 - [ ] **RGB LED:** 220 Ω soldered on each colour leg → **D5** (red), **D6** (green), **D9** (blue); common (longest) leg → **GND** (right). Pushed into the top-left hole of the box.
-- [ ] `output_test` sketch that cycles through all patterns.
+- [x] Pattern library `cane_output.h`: every sound and light from Phase 7, non-blocking, background + one-shot layers. Timing checked in simulation (13 checks).
+- [x] `output_test` sketch: each pattern by key, or `d` for a demo of every situation.
+- [ ] Run `output_test` on the real LED and buzzer; tune timings by ear, check the amber mix looks amber.
 
 ### 1.6 Power
 - [ ] 9 V clip: red → **VIN**, black → **GND** (left). Tin the stranded ends so they push firmly into the breadboard. Confirm the Nano boots with USB unplugged.
@@ -231,7 +235,7 @@ Uses the FSR grip sensor (1.4), which reports a continuous grip. Grip pressure c
 | Dropped cane | See Phase 5 | Locator chirps, blinking LED |
 | Fall | Held through impact, flat and still (or no re-grip within 5 s) | Red LED, buzzer, 15 s cancel, then phone alert |
 
-- [ ] Non-blocking pattern player for LED / buzzer (no `delay()`, sensing never stops).
+- [x] Non-blocking pattern player for LED / buzzer (`cane_output.h`; no `delay()`, sensing never stops).
 - [ ] Every gesture is acknowledged (one short chirp + LED blink).
 - [ ] Rhythm cue ticks timed to the baseline stride interval; keep them short so they guide without becoming noise.
 - [ ] Every pattern must be distinct by ear: rhythm ticks, rest double-beep, near-fall triple beep, locator chirps, countdown, alarm.
