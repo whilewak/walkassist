@@ -9,7 +9,7 @@ that folder to the compiler. In the Arduino IDE, copy or symlink
 | Sketch | What it does |
 |---|---|
 | `i2c_scan/` | Lists every I2C device. Run this first to check the wiring. |
-| `touch_test/` | Grip sensor test: touches, gestures, and the 2-minute hold test. |
+| `touch_test/` | Grip sensor (FSR) test: pressure readings, gestures, and the 2-minute hold test. |
 | `imu_logger/` | Reads both IMUs and the grip sensor at 100 Hz and streams CSV over USB. |
 
 ## Pin map
@@ -20,29 +20,34 @@ Full schematic: [`docs/circuit.svg`](../docs/circuit.svg). Everything runs at 3.
 |---|---|---|
 | 3V3, GND | All modules' power | Never 9 V here |
 | A4 (SDA), A5 (SCL) | MPU-6050 tip IMU | Onboard LSM6DS3 shares this bus (0x6A) |
-| A0 | FSR grip sensor (planned) | 3V3 → FSR → A0 → 10 kΩ → GND |
-| D2 | AT42QT1010 OUT (temporary) | Freed once the FSR is in |
-| D3 (PWM) | 1 kΩ → 2N4401 base → vibration motor | Motor from 3V3 to collector, diode across it (stripe toward 3V3) |
-| D4 | 1 kΩ → 2N4401 base → active buzzer | Buzzer + leg to 3V3, − leg to collector |
+| A0 | Round FSR grip sensor | 3V3 → FSR → row 16 → jumper → A0; 10 kΩ from row 16 to GND |
+| D4 | 1 kΩ → 2N4401 base → active buzzer | Buzzer + leg to 3V3, − leg to collector; emitter to GND |
 | D5 / D6 / D9 (PWM) | 220 Ω → RGB LED red / green / blue | Common cathode to GND |
-| VIN | 9 V battery + (through the switch) | Battery − to GND |
+| VIN | 9 V battery + | Battery − to GND |
 
-Free: D7, D8, D10–D12, A1–A3, A6, A7. Avoid D0/D1 (Serial1) and D13 (onboard LED).
+Free: D2, D3, D7, D8, D10–D12, A1–A3, A6, A7. Avoid D0/D1 (Serial1) and D13 (onboard LED).
+(No vibration motor: outputs are the RGB LED and the buzzer.)
 
-## Wiring: grip touch sensor (Adafruit AT42QT1010 breakout)
+## Wiring: grip sensor (round FSR on A0)
 
-| Touch board pin | Nano 33 IoT pin |
+The FSR's resistance drops when it's pressed. With a 10 kΩ resistor to GND,
+A0 reads ~0 with no hand and rises toward 1023 as the grip is squeezed.
+
+| Connection | Breadboard |
 |---|---|
-| VIN | 3.3V |
-| GND | GND |
-| OUT | **D2** |
+| FSR leg 1 | **3V3** row |
+| FSR leg 2 | free **row 16** (left half) |
+| 10 kΩ resistor | from the left **GND** row to row 16 |
+| Jumper | from row 16 to the **A0** row |
 
-- Don't touch the pad while powering up; the chip calibrates at power-on.
-- The Nano's orange LED lights while the sensor reads "touched" (both sketches).
-- To sense through the cane grip, wire the board's pad to copper tape or a
-  conductive sheet wrapped around the grip.
-- The SparkFun SEN-12041 uses the same AT42QT1010 chip and wires the same way: VDD → 3.3V, GND, OUT → D2.
-- **The AT42QT1010 drops its output after ~60 s of continuous touch** (it recalibrates; datasheet §3.3). Run the hold test below.
+- Don't solder the FSR's legs (heat melts its plastic): push female jumper wires on.
+- Place it on top of the handle where the palm presses hardest, under one thin
+  layer of tape. The FSR's legs can go either way round.
+- The Nano's orange LED lights while the grip counts as pressed (both sketches).
+- "Pressed" = pressure above 150, "released" = below 100 (`PRESS_THRESHOLD`,
+  `RELEASE_THRESHOLD` in `cane_touch.h`). The gap stops flicker.
+- Unlike the old AT42QT1010 touch board, the FSR has no timeout, so a long
+  grip stays "pressed". The touch board is no longer used; D2 is free.
 
 ### Gestures
 
@@ -56,11 +61,17 @@ The hand leaves the grip, then taps (each tap under 0.35 s, gaps under 0.45 s):
 A long press isn't used: holding the cane while walking already looks like one.
 Timing constants are at the top of `cane_touch.h`.
 
-### Hold test
+### Grip test
 
-Upload `touch_test`, grip the sensor and keep holding for 2+ minutes. A
-`still held` line prints every 10 s. If `UP` appears while your hand is still
-on it, the chip recalibrated during the long touch; note after how long.
+Upload `touch_test` and open the Serial Monitor:
+
+1. With no hand on the grip, the status line shows the pressure (should be near 0).
+2. Rest your hand lightly, grip normally, then lean hard; note each pressure.
+   150 should sit between "resting" and "gripping"; if not, change the
+   thresholds in `cane_touch.h`.
+3. Try double and triple taps.
+4. Hold for 2+ minutes: `still held` prints every 10 s with the pressure, and
+   `UP` should appear only when you let go.
 
 ## Wiring: tip IMU (MPU-6050 / GY-521 board)
 
@@ -105,7 +116,8 @@ python3 tools/plot_session.py data/normal_walk_<timestamp>.csv
 
 CSV columns: `t_ms`, handle `h_ax…h_gz`, tip `t_ax…t_gz`, `h_ok`, `t_ok`,
 `touch` (1 = gripped), `gesture` (2 = double tap, 3 = triple tap, on the
-sample where it finished). `log_serial.py` adds `mark` for Enter presses.
+sample where it finished), `grip` (FSR pressure 0–1023). `log_serial.py` adds
+`mark` for Enter presses.
 
 ## If the tip IMU isn't found
 

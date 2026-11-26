@@ -1,7 +1,15 @@
-// WALKASSIST - grip touch sensor (AT42QT1010 breakout: Adafruit 1374 or SparkFun SEN-12041) with tap gestures.
+// WALKASSIST - grip sensor: round FSR (force-sensitive resistor) on A0, with tap gestures.
 //
-// Wiring: VIN -> 3.3V, GND -> GND, OUT -> D2. OUT is HIGH while touched.
-// Don't touch the pad while the board powers up: the chip calibrates then.
+// Wiring (see docs/circuit.svg):
+//   FSR leg 1 -> 3V3
+//   FSR leg 2 -> A0 (through the breadboard's free row 16 + a jumper)
+//   10 kOhm   -> from A0's node (row 16) to GND
+// A0 reads ~0 with no hand on the grip and rises as the grip is squeezed
+// (0..1023, 10-bit). Unlike the old capacitive board, an FSR has no timeout:
+// it reports a grip for as long as the hand presses.
+//
+// "Touched" = pressure above PRESS_THRESHOLD; it stays touched until the
+// pressure drops below RELEASE_THRESHOLD (the gap stops flicker near the edge).
 //
 // Gestures (the hand must leave the grip first, then tap):
 //   double tap  = two quick taps    -> cancel / "I'm OK" / accept baseline
@@ -31,20 +39,34 @@ inline const char* gestureName(Gesture g) {
 
 class TouchSensor {
  public:
+  // Pressure thresholds (0..1023). Tune on the real grip with touch_test.
+  static const uint16_t PRESS_THRESHOLD = 150;    // above this: touched
+  static const uint16_t RELEASE_THRESHOLD = 100;  // below this: released
+
   // Timing, in ms. Tune these on the real grip.
+  static const uint32_t SAMPLE_MS = 2;      // read A0 at most this often
   static const uint32_t DEBOUNCE_MS = 20;   // ignore flicker shorter than this
   static const uint32_t TAP_MAX_MS = 350;   // a touch longer than this is a grip, not a tap
   static const uint32_t GAP_MAX_MS = 450;   // max time between taps in one gesture
 
-  void begin(uint8_t pin) {
+  void begin(uint8_t pin = A0) {
     pin_ = pin;
-    pinMode(pin_, INPUT_PULLDOWN);  // reads "not touched" if the sensor is unplugged
-    raw_ = stable_ = digitalRead(pin_);
-    rawChangedAt_ = downAt_ = upAt_ = millis();
+    pinMode(pin_, INPUT);
+    analogReadResolution(10);               // 0..1023
+    pressure_ = analogRead(pin_);
+    raw_ = stable_ = pressure_ > PRESS_THRESHOLD;
+    rawChangedAt_ = downAt_ = upAt_ = lastSampleAt_ = millis();
   }
 
   Gesture update(uint32_t now = millis()) {
-    bool r = digitalRead(pin_);
+    // Read and lightly smooth the pressure (1/4 new reading, 3/4 previous).
+    if (now - lastSampleAt_ >= SAMPLE_MS) {
+      lastSampleAt_ = now;
+      pressure_ = (3 * pressure_ + analogRead(pin_)) / 4;
+    }
+
+    // Pressed / released with a gap between the two thresholds.
+    bool r = raw_ ? (pressure_ >= RELEASE_THRESHOLD) : (pressure_ > PRESS_THRESHOLD);
     if (r != raw_) {
       raw_ = r;
       rawChangedAt_ = now;
@@ -84,6 +106,10 @@ class TouchSensor {
 
   bool touched() const { return stable_; }
 
+  // Smoothed grip pressure, 0 (no hand) .. 1023 (squeezed hard). Also a gait
+  // signal: how hard the user leans on the cane.
+  uint16_t pressure() const { return pressure_; }
+
   // How long the current touch has lasted (0 if not touched).
   uint32_t heldMs(uint32_t now = millis()) const { return stable_ ? now - downAt_ : 0; }
 
@@ -91,9 +117,11 @@ class TouchSensor {
   uint32_t lastTouchMs() const { return lastTouchMs_; }
 
  private:
-  uint8_t pin_ = 2;
+  uint8_t pin_ = A0;
+  uint16_t pressure_ = 0;
   bool raw_ = false;
   bool stable_ = false;
+  uint32_t lastSampleAt_ = 0;
   uint32_t rawChangedAt_ = 0;
   uint32_t downAt_ = 0;
   uint32_t upAt_ = 0;

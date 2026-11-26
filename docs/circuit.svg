@@ -1,232 +1,361 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 780" width="1200" height="780" font-family="Helvetica, Arial, sans-serif">
-  <defs>
-    <g id="gnd">
-      <line x1="0" y1="0" x2="0" y2="10" stroke="#1e293b" stroke-width="2"/>
-      <line x1="-12" y1="10" x2="12" y2="10" stroke="#1e293b" stroke-width="2"/>
-      <line x1="-8" y1="15" x2="8" y2="15" stroke="#1e293b" stroke-width="2"/>
-      <line x1="-4" y1="20" x2="4" y2="20" stroke="#1e293b" stroke-width="2"/>
-    </g>
-    <g id="v33">
-      <line x1="0" y1="0" x2="0" y2="10" stroke="#c0392b" stroke-width="2"/>
-      <line x1="-12" y1="0" x2="12" y2="0" stroke="#c0392b" stroke-width="2.5"/>
-      <text x="0" y="-6" text-anchor="middle" font-size="13" font-weight="bold" fill="#c0392b">3V3</text>
-    </g>
-  </defs>
-
-  <rect width="1200" height="780" fill="#ffffff"/>
-
-  <!-- Title -->
-  <text x="40" y="42" font-size="24" font-weight="bold" fill="#0f172a">WALKASSIST wiring: Arduino Nano 33 IoT</text>
-  <text x="40" y="66" font-size="14" fill="#475569">Everything runs at 3.3 V. Dashed = temporary part. Red = 3.3 V, blue = signals, black = ground.</text>
-
-  <!-- ============================ Nano 33 IoT ============================ -->
-  <rect x="470" y="170" width="260" height="460" rx="10" fill="#e0f2fe" stroke="#0369a1" stroke-width="2.5"/>
-  <text x="600" y="194" text-anchor="middle" font-size="16" font-weight="bold" fill="#0c4a6e">Arduino Nano 33 IoT</text>
-  <!-- left pins -->
-  <g font-size="14" fill="#0f172a">
-    <text x="480" y="215">3V3</text>
-    <text x="480" y="255">GND</text>
-    <text x="480" y="305">A4 (SDA)</text>
-    <text x="480" y="345">A5 (SCL)</text>
-    <text x="480" y="405">A0 (analog)</text>
-    <text x="480" y="535">D2</text>
-    <text x="480" y="595">VIN</text>
-  </g>
-  <!-- right pins -->
-  <g font-size="14" fill="#0f172a" text-anchor="end">
-    <text x="720" y="255">D3 (PWM)</text>
-    <text x="720" y="355">D5 (PWM)</text>
-    <text x="720" y="390">D6 (PWM)</text>
-    <text x="720" y="425">D9 (PWM)</text>
-    <text x="720" y="535">D4</text>
-  </g>
-  <g font-size="12.5" fill="#334155" text-anchor="middle">
-    <text x="600" y="455">Onboard LSM6DS3 IMU</text>
-    <text x="600" y="472">(handle) on I2C, 0x6A</text>
-    <text x="600" y="496">Orange LED (D13)</text>
-    <text x="600" y="513">mirrors the grip</text>
-  </g>
-  <!-- pin stubs -->
-  <g fill="#0f172a">
-    <circle cx="470" cy="210" r="3.5"/><circle cx="470" cy="250" r="3.5"/><circle cx="470" cy="300" r="3.5"/>
-    <circle cx="470" cy="340" r="3.5"/><circle cx="470" cy="400" r="3.5"/><circle cx="470" cy="530" r="3.5"/>
-    <circle cx="470" cy="590" r="3.5"/>
-    <circle cx="730" cy="250" r="3.5"/><circle cx="730" cy="350" r="3.5"/><circle cx="730" cy="385" r="3.5"/>
-    <circle cx="730" cy="420" r="3.5"/><circle cx="730" cy="530" r="3.5"/>
-  </g>
-
-  <!-- ============================ Tip IMU ============================ -->
-  <rect x="60" y="180" width="230" height="180" rx="8" fill="#f8fafc" stroke="#334155" stroke-width="2"/>
-  <text x="72" y="204" font-size="15" font-weight="bold" fill="#0f172a">MPU-6050 (GY-521)</text>
-  <text x="72" y="224" font-size="12.5" fill="#475569">Tip IMU, I2C 0x68</text>
-  <text x="72" y="241" font-size="12.5" fill="#475569">~1.2 m cable down</text>
-  <text x="72" y="257" font-size="12.5" fill="#475569">the shaft</text>
-  <text x="72" y="328" font-size="12" fill="#64748b">AD0, INT, XDA, XCL:</text>
-  <text x="72" y="345" font-size="12" fill="#64748b">leave unconnected</text>
-  <g font-size="13" fill="#0f172a" text-anchor="end">
-    <text x="282" y="214">VCC</text>
-    <text x="282" y="254">GND</text>
-    <text x="282" y="304">SDA</text>
-    <text x="282" y="344">SCL</text>
-  </g>
-  <line x1="290" y1="210" x2="470" y2="210" stroke="#c0392b" stroke-width="2.5"/>
-  <line x1="290" y1="250" x2="470" y2="250" stroke="#1e293b" stroke-width="2.5"/>
-  <line x1="290" y1="300" x2="470" y2="300" stroke="#2563eb" stroke-width="2.5"/>
-  <line x1="290" y1="340" x2="470" y2="340" stroke="#2563eb" stroke-width="2.5"/>
-
-  <!-- ============================ Grip FSR (planned) ============================ -->
-  <text x="60" y="378" font-size="13" font-weight="bold" fill="#0f172a">Grip FSR (planned): square FSR + 10 kΩ</text>
-  <text x="62" y="405" font-size="13" font-weight="bold" fill="#c0392b">3V3</text>
-  <line x1="94" y1="400" x2="160" y2="400" stroke="#c0392b" stroke-width="2.5"/>
-  <rect x="160" y="391" width="80" height="18" fill="#ffffff" stroke="#1e293b" stroke-width="2"/>
-  <line x1="172" y1="414" x2="230" y2="388" stroke="#1e293b" stroke-width="1.5"/>
-  <polygon points="232,387 222,388 226,395" fill="#1e293b"/>
-  <text x="200" y="430" text-anchor="middle" font-size="12" fill="#475569">FSR</text>
-  <line x1="240" y1="400" x2="470" y2="400" stroke="#2563eb" stroke-width="2.5"/>
-  <circle cx="360" cy="400" r="4" fill="#1e293b"/>
-  <line x1="360" y1="400" x2="360" y2="412" stroke="#1e293b" stroke-width="2"/>
-  <rect x="352" y="412" width="16" height="40" fill="#ffffff" stroke="#1e293b" stroke-width="2"/>
-  <text x="376" y="437" font-size="12" fill="#475569">10 kΩ</text>
-  <line x1="360" y1="452" x2="360" y2="462" stroke="#1e293b" stroke-width="2"/>
-  <use href="#gnd" x="360" y="462"/>
-  <text x="62" y="455" font-size="12" fill="#64748b">Press harder → higher</text>
-  <text x="62" y="471" font-size="12" fill="#64748b">voltage on A0</text>
-
-  <!-- ============================ Touch board (temporary) ============================ -->
-  <rect x="60" y="500" width="230" height="74" rx="8" fill="#f8fafc" stroke="#334155" stroke-width="2" stroke-dasharray="7 5"/>
-  <text x="72" y="519" font-size="13.5" font-weight="bold" fill="#0f172a">AT42QT1010 touch</text>
-  <text x="72" y="545" font-size="12" fill="#475569">VIN → 3V3, GND → GND</text>
-  <text x="72" y="563" font-size="12" fill="#475569">Temporary: drops after ~20 s</text>
-  <line x1="290" y1="530" x2="470" y2="530" stroke="#2563eb" stroke-width="2.5" stroke-dasharray="7 5"/>
-  <text x="300" y="523" font-size="12" fill="#475569">OUT</text>
-
-  <!-- ============================ Power ============================ -->
-  <rect x="60" y="630" width="140" height="74" rx="8" fill="#fefce8" stroke="#a16207" stroke-width="2"/>
-  <text x="130" y="662" text-anchor="middle" font-size="14" font-weight="bold" fill="#713f12">9 V battery</text>
-  <text x="130" y="682" text-anchor="middle" font-size="12" fill="#713f12">(+ spares)</text>
-  <text x="190" y="650" text-anchor="end" font-size="14" font-weight="bold" fill="#c0392b">+</text>
-  <text x="190" y="696" text-anchor="end" font-size="16" font-weight="bold" fill="#1e293b">−</text>
-  <!-- + to switch to VIN -->
-  <line x1="200" y1="645" x2="270" y2="645" stroke="#c0392b" stroke-width="2.5"/>
-  <circle cx="270" cy="645" r="4" fill="#ffffff" stroke="#1e293b" stroke-width="2"/>
-  <line x1="272" y1="643" x2="314" y2="628" stroke="#1e293b" stroke-width="2.5"/>
-  <circle cx="318" cy="645" r="4" fill="#ffffff" stroke="#1e293b" stroke-width="2"/>
-  <text x="294" y="620" text-anchor="middle" font-size="12" fill="#475569">on/off switch</text>
-  <line x1="322" y1="645" x2="420" y2="645" stroke="#c0392b" stroke-width="2.5"/>
-  <line x1="420" y1="645" x2="420" y2="590" stroke="#c0392b" stroke-width="2.5"/>
-  <line x1="420" y1="590" x2="470" y2="590" stroke="#c0392b" stroke-width="2.5"/>
-  <text x="345" y="666" font-size="12" fill="#c0392b">9 V → VIN only</text>
-  <!-- − to GND -->
-  <line x1="200" y1="690" x2="240" y2="690" stroke="#1e293b" stroke-width="2.5"/>
-  <use href="#gnd" x="240" y="690"/>
-
-  <!-- ============================ Vibration motor (D3) ============================ -->
-  <line x1="730" y1="250" x2="780" y2="250" stroke="#2563eb" stroke-width="2.5"/>
-  <rect x="780" y="242" width="60" height="16" fill="#ffffff" stroke="#1e293b" stroke-width="2"/>
-  <text x="810" y="236" text-anchor="middle" font-size="12" fill="#475569">1 kΩ</text>
-  <line x1="840" y1="250" x2="912" y2="250" stroke="#2563eb" stroke-width="2.5"/>
-  <!-- transistor Q1 at (925,250) -->
-  <circle cx="925" cy="250" r="24" fill="#ffffff" stroke="#1e293b" stroke-width="2"/>
-  <line x1="912" y1="236" x2="912" y2="264" stroke="#1e293b" stroke-width="3"/>
-  <line x1="912" y1="244" x2="938" y2="228" stroke="#1e293b" stroke-width="2"/>
-  <line x1="912" y1="256" x2="938" y2="272" stroke="#1e293b" stroke-width="2"/>
-  <polygon points="938,272 928,270 933,263" fill="#1e293b"/>
-  <text x="956" y="262" font-size="12" fill="#475569">Q1 2N4401</text>
-  <!-- collector up to motor -->
-  <line x1="938" y1="228" x2="938" y2="203" stroke="#1e293b" stroke-width="2"/>
-  <circle cx="938" cy="185" r="18" fill="#fff7ed" stroke="#1e293b" stroke-width="2"/>
-  <text x="938" y="190" text-anchor="middle" font-size="15" font-weight="bold" fill="#0f172a">M</text>
-  <line x1="938" y1="167" x2="938" y2="160" stroke="#c0392b" stroke-width="2"/>
-  <use href="#v33" x="938" y="150"/>
-  <circle cx="938" cy="160" r="3.5" fill="#1e293b"/>
-  <circle cx="938" cy="222" r="3.5" fill="#1e293b"/>
-  <text x="912" y="180" text-anchor="end" font-size="13" font-weight="bold" fill="#0f172a">Vibration</text>
-  <text x="912" y="196" text-anchor="end" font-size="13" font-weight="bold" fill="#0f172a">motor</text>
-  <!-- flyback diode, cathode (bar) toward 3V3 -->
-  <line x1="938" y1="160" x2="1010" y2="160" stroke="#c0392b" stroke-width="2"/>
-  <line x1="1010" y1="160" x2="1010" y2="188" stroke="#1e293b" stroke-width="2"/>
-  <line x1="1000" y1="188" x2="1020" y2="188" stroke="#1e293b" stroke-width="3"/>
-  <polygon points="1010,189 1000,207 1020,207" fill="#1e293b"/>
-  <line x1="1010" y1="207" x2="1010" y2="222" stroke="#1e293b" stroke-width="2"/>
-  <line x1="1010" y1="222" x2="938" y2="222" stroke="#1e293b" stroke-width="2"/>
-  <text x="1030" y="196" font-size="12" fill="#475569">Diode, stripe</text>
-  <text x="1030" y="212" font-size="12" fill="#475569">toward 3V3</text>
-  <!-- emitter to ground -->
-  <line x1="938" y1="272" x2="938" y2="290" stroke="#1e293b" stroke-width="2"/>
-  <use href="#gnd" x="938" y="290"/>
-
-  <!-- ============================ RGB LED (D5, D6, D9) ============================ -->
-  <text x="810" y="336" text-anchor="middle" font-size="12" fill="#475569">220 Ω each</text>
-  <g stroke-width="2.5">
-    <line x1="730" y1="350" x2="780" y2="350" stroke="#2563eb"/>
-    <line x1="730" y1="385" x2="780" y2="385" stroke="#2563eb"/>
-    <line x1="730" y1="420" x2="780" y2="420" stroke="#2563eb"/>
-  </g>
-  <g fill="#ffffff" stroke="#1e293b" stroke-width="2">
-    <rect x="780" y="342" width="60" height="16"/>
-    <rect x="780" y="377" width="60" height="16"/>
-    <rect x="780" y="412" width="60" height="16"/>
-  </g>
-  <g stroke="#1e293b" stroke-width="2">
-    <line x1="840" y1="350" x2="880" y2="350"/>
-    <line x1="840" y1="385" x2="880" y2="385"/>
-    <line x1="840" y1="420" x2="880" y2="420"/>
-    <line x1="902" y1="350" x2="960" y2="350"/>
-    <line x1="902" y1="385" x2="960" y2="385"/>
-    <line x1="902" y1="420" x2="960" y2="420"/>
-    <line x1="960" y1="350" x2="960" y2="420"/>
-    <line x1="960" y1="420" x2="1040" y2="420"/>
-  </g>
-  <!-- LED symbols -->
-  <polygon points="880,340 880,360 902,350" fill="#ef4444" stroke="#1e293b" stroke-width="1.5"/>
-  <line x1="902" y1="340" x2="902" y2="360" stroke="#1e293b" stroke-width="3"/>
-  <polygon points="880,375 880,395 902,385" fill="#22c55e" stroke="#1e293b" stroke-width="1.5"/>
-  <line x1="902" y1="375" x2="902" y2="395" stroke="#1e293b" stroke-width="3"/>
-  <polygon points="880,410 880,430 902,420" fill="#3b82f6" stroke="#1e293b" stroke-width="1.5"/>
-  <line x1="902" y1="410" x2="902" y2="430" stroke="#1e293b" stroke-width="3"/>
-  <g font-size="12" font-weight="bold" fill="#0f172a">
-    <text x="912" y="344">R</text>
-    <text x="912" y="379">G</text>
-    <text x="912" y="414">B</text>
-  </g>
-  <circle cx="960" cy="385" r="3.5" fill="#1e293b"/>
-  <circle cx="960" cy="420" r="3.5" fill="#1e293b"/>
-  <text x="975" y="370" font-size="13" font-weight="bold" fill="#0f172a">RGB LED</text>
-  <text x="975" y="387" font-size="12" fill="#475569">common cathode</text>
-  <text x="975" y="403" font-size="12" fill="#475569">(longest leg → GND)</text>
-  <use href="#gnd" x="1040" y="420"/>
-
-  <!-- ============================ Buzzer (D4) ============================ -->
-  <line x1="730" y1="530" x2="780" y2="530" stroke="#2563eb" stroke-width="2.5"/>
-  <rect x="780" y="522" width="60" height="16" fill="#ffffff" stroke="#1e293b" stroke-width="2"/>
-  <text x="810" y="516" text-anchor="middle" font-size="12" fill="#475569">1 kΩ</text>
-  <line x1="840" y1="530" x2="912" y2="530" stroke="#2563eb" stroke-width="2.5"/>
-  <!-- transistor Q2 at (925,530) -->
-  <circle cx="925" cy="530" r="24" fill="#ffffff" stroke="#1e293b" stroke-width="2"/>
-  <line x1="912" y1="516" x2="912" y2="544" stroke="#1e293b" stroke-width="3"/>
-  <line x1="912" y1="524" x2="938" y2="508" stroke="#1e293b" stroke-width="2"/>
-  <line x1="912" y1="536" x2="938" y2="552" stroke="#1e293b" stroke-width="2"/>
-  <polygon points="938,552 928,550 933,543" fill="#1e293b"/>
-  <text x="956" y="545" font-size="12" fill="#475569">Q2 2N4401</text>
-  <line x1="938" y1="508" x2="938" y2="497" stroke="#1e293b" stroke-width="2"/>
-  <rect x="918" y="465" width="40" height="32" rx="4" fill="#fff7ed" stroke="#1e293b" stroke-width="2"/>
-  <text x="938" y="486" text-anchor="middle" font-size="12" font-weight="bold" fill="#0f172a">BZ</text>
-  <text x="926" y="476" text-anchor="middle" font-size="10" fill="#c0392b">+</text>
-  <line x1="938" y1="465" x2="938" y2="458" stroke="#c0392b" stroke-width="2"/>
-  <use href="#v33" x="938" y="448"/>
-  <text x="972" y="480" font-size="13" font-weight="bold" fill="#0f172a">Active buzzer</text>
-  <text x="972" y="496" font-size="12" fill="#475569">+ leg toward 3V3</text>
-  <line x1="938" y1="552" x2="938" y2="575" stroke="#1e293b" stroke-width="2"/>
-  <use href="#gnd" x="938" y="575"/>
-
-  <!-- ============================ Pin budget ============================ -->
-  <rect x="760" y="625" width="410" height="132" rx="8" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5"/>
-  <text x="776" y="650" font-size="14" font-weight="bold" fill="#0f172a">Pin budget: 9 used, plenty free</text>
-  <g font-size="12.5" fill="#334155">
-    <text x="776" y="672">Used: A4, A5 (I2C) · A0 (FSR) · D2 (touch, temporary)</text>
-    <text x="776" y="690">D3 (motor) · D4 (buzzer) · D5, D6, D9 (LED) · VIN</text>
-    <text x="776" y="712">Free: D7, D8, D10, D11, D12, A1, A2, A3, A6, A7</text>
-    <text x="776" y="730">Avoid: D0/D1 (Serial1), D13 (onboard LED)</text>
-    <text x="776" y="748">Once the FSR replaces the touch board, D2 is free too.</text>
-  </g>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1240 900" width="1240" height="900" font-family="Helvetica, Arial, sans-serif">
+<rect width="1240" height="900" fill="#ffffff"/>
+<text x="40" y="44" font-size="24" text-anchor="start" font-weight="bold" fill="#0f172a">WALKASSIST wiring: Nano 33 IoT on a mini breadboard</text>
+<text x="40" y="68" font-size="14" text-anchor="start" font-weight="normal" fill="#475569">Each Nano pin's row: 3 free holes on the left, 2 on the right. Row 16 (bottom) is free. Check the pin names printed on your Nano match.</text>
+<text x="40" y="88" font-size="14" text-anchor="start" font-weight="normal" fill="#475569">Everything runs at 3.3 V; the 9 V battery goes only to VIN. Dashed = assembly soldered off the breadboard.</text>
+<rect x="496" y="206" width="334" height="438" rx="8" fill="#f4f4f2" stroke="#9ca3af" stroke-width="2"/>
+<rect x="653.0" y="206" width="20" height="438" fill="#e5e7eb"/>
+<rect x="516" y="226" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="542" y="226" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="568" y="226" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="594" y="226" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="620" y="226" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="698" y="226" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="724" y="226" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="750" y="226" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="776" y="226" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="802" y="226" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="516" y="252" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="542" y="252" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="568" y="252" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="594" y="252" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="620" y="252" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="698" y="252" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="724" y="252" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="750" y="252" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="776" y="252" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="802" y="252" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="516" y="278" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="542" y="278" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="568" y="278" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="594" y="278" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="620" y="278" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="698" y="278" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="724" y="278" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="750" y="278" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="776" y="278" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="802" y="278" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="516" y="304" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="542" y="304" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="568" y="304" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="594" y="304" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="620" y="304" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="698" y="304" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="724" y="304" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="750" y="304" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="776" y="304" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="802" y="304" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="516" y="330" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="542" y="330" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="568" y="330" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="594" y="330" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="620" y="330" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="698" y="330" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="724" y="330" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="750" y="330" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="776" y="330" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="802" y="330" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="516" y="356" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="542" y="356" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="568" y="356" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="594" y="356" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="620" y="356" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="698" y="356" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="724" y="356" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="750" y="356" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="776" y="356" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="802" y="356" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="516" y="382" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="542" y="382" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="568" y="382" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="594" y="382" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="620" y="382" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="698" y="382" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="724" y="382" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="750" y="382" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="776" y="382" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="802" y="382" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="516" y="408" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="542" y="408" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="568" y="408" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="594" y="408" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="620" y="408" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="698" y="408" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="724" y="408" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="750" y="408" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="776" y="408" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="802" y="408" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="516" y="434" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="542" y="434" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="568" y="434" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="594" y="434" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="620" y="434" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="698" y="434" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="724" y="434" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="750" y="434" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="776" y="434" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="802" y="434" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="516" y="460" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="542" y="460" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="568" y="460" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="594" y="460" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="620" y="460" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="698" y="460" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="724" y="460" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="750" y="460" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="776" y="460" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="802" y="460" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="516" y="486" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="542" y="486" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="568" y="486" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="594" y="486" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="620" y="486" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="698" y="486" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="724" y="486" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="750" y="486" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="776" y="486" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="802" y="486" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="516" y="512" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="542" y="512" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="568" y="512" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="594" y="512" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="620" y="512" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="698" y="512" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="724" y="512" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="750" y="512" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="776" y="512" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="802" y="512" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="516" y="538" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="542" y="538" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="568" y="538" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="594" y="538" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="620" y="538" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="698" y="538" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="724" y="538" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="750" y="538" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="776" y="538" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="802" y="538" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="516" y="564" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="542" y="564" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="568" y="564" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="594" y="564" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="620" y="564" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="698" y="564" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="724" y="564" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="750" y="564" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="776" y="564" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="802" y="564" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="516" y="590" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="542" y="590" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="568" y="590" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="594" y="590" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="620" y="590" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="698" y="590" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="724" y="590" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="750" y="590" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="776" y="590" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="802" y="590" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="516" y="616" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="542" y="616" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="568" y="616" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="594" y="616" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="620" y="616" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="698" y="616" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="724" y="616" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="750" y="616" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="776" y="616" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="802" y="616" width="8" height="8" rx="1.5" fill="#cbd5e1"/>
+<rect x="506" y="608" width="132" height="24" rx="5" fill="none" stroke="#ca8a04" stroke-width="1.5" stroke-dasharray="4 3"/>
+<rect x="688" y="608" width="132" height="24" rx="5" fill="none" stroke="#9ca3af" stroke-width="1.5" stroke-dasharray="4 3"/>
+<rect x="584" y="196" width="184" height="412" rx="6" fill="#1e3a8a" stroke="#0f172a" stroke-width="2"/>
+<rect x="656.0" y="184" width="40" height="22" rx="3" fill="#cbd5e1" stroke="#475569" stroke-width="1.5"/>
+<text x="676.0" y="178" font-size="11" text-anchor="middle" font-weight="normal" fill="#475569">USB</text>
+<text x="676.0" y="434" font-size="13" text-anchor="middle" font-weight="bold" fill="#e0e7ff">Arduino</text>
+<text x="676.0" y="451" font-size="13" text-anchor="middle" font-weight="bold" fill="#e0e7ff">Nano 33 IoT</text>
+<circle cx="598" cy="230" r="5" fill="#fbbf24" stroke="#78350f" stroke-width="1"/>
+<text x="610" y="234" font-size="11" text-anchor="start" font-weight="normal" fill="#93a3c7">D13</text>
+<circle cx="598" cy="256" r="5" fill="#fbbf24" stroke="#78350f" stroke-width="1"/>
+<text x="610" y="260" font-size="11" text-anchor="start" font-weight="bold" fill="#ffffff">3V3</text>
+<circle cx="598" cy="282" r="5" fill="#fbbf24" stroke="#78350f" stroke-width="1"/>
+<text x="610" y="286" font-size="11" text-anchor="start" font-weight="normal" fill="#93a3c7">AREF</text>
+<circle cx="598" cy="308" r="5" fill="#fbbf24" stroke="#78350f" stroke-width="1"/>
+<text x="610" y="312" font-size="11" text-anchor="start" font-weight="bold" fill="#ffffff">A0</text>
+<circle cx="598" cy="334" r="5" fill="#fbbf24" stroke="#78350f" stroke-width="1"/>
+<text x="610" y="338" font-size="11" text-anchor="start" font-weight="normal" fill="#93a3c7">A1</text>
+<circle cx="598" cy="360" r="5" fill="#fbbf24" stroke="#78350f" stroke-width="1"/>
+<text x="610" y="364" font-size="11" text-anchor="start" font-weight="normal" fill="#93a3c7">A2</text>
+<circle cx="598" cy="386" r="5" fill="#fbbf24" stroke="#78350f" stroke-width="1"/>
+<text x="610" y="390" font-size="11" text-anchor="start" font-weight="normal" fill="#93a3c7">A3</text>
+<circle cx="598" cy="412" r="5" fill="#fbbf24" stroke="#78350f" stroke-width="1"/>
+<text x="610" y="416" font-size="11" text-anchor="start" font-weight="bold" fill="#ffffff">A4</text>
+<circle cx="598" cy="438" r="5" fill="#fbbf24" stroke="#78350f" stroke-width="1"/>
+<text x="610" y="442" font-size="11" text-anchor="start" font-weight="bold" fill="#ffffff">A5</text>
+<circle cx="598" cy="464" r="5" fill="#fbbf24" stroke="#78350f" stroke-width="1"/>
+<text x="610" y="468" font-size="11" text-anchor="start" font-weight="normal" fill="#93a3c7">A6</text>
+<circle cx="598" cy="490" r="5" fill="#fbbf24" stroke="#78350f" stroke-width="1"/>
+<text x="610" y="494" font-size="11" text-anchor="start" font-weight="normal" fill="#93a3c7">A7</text>
+<circle cx="598" cy="516" r="5" fill="#fbbf24" stroke="#78350f" stroke-width="1"/>
+<text x="610" y="520" font-size="11" text-anchor="start" font-weight="normal" fill="#93a3c7">+5V</text>
+<circle cx="598" cy="542" r="5" fill="#fbbf24" stroke="#78350f" stroke-width="1"/>
+<text x="610" y="546" font-size="11" text-anchor="start" font-weight="normal" fill="#93a3c7">RST</text>
+<circle cx="598" cy="568" r="5" fill="#fbbf24" stroke="#78350f" stroke-width="1"/>
+<text x="610" y="572" font-size="11" text-anchor="start" font-weight="bold" fill="#ffffff">GND</text>
+<circle cx="598" cy="594" r="5" fill="#fbbf24" stroke="#78350f" stroke-width="1"/>
+<text x="610" y="598" font-size="11" text-anchor="start" font-weight="bold" fill="#ffffff">VIN</text>
+<circle cx="754" cy="230" r="5" fill="#fbbf24" stroke="#78350f" stroke-width="1"/>
+<text x="742" y="234" font-size="11" text-anchor="end" font-weight="normal" fill="#93a3c7">D12</text>
+<circle cx="754" cy="256" r="5" fill="#fbbf24" stroke="#78350f" stroke-width="1"/>
+<text x="742" y="260" font-size="11" text-anchor="end" font-weight="normal" fill="#93a3c7">D11</text>
+<circle cx="754" cy="282" r="5" fill="#fbbf24" stroke="#78350f" stroke-width="1"/>
+<text x="742" y="286" font-size="11" text-anchor="end" font-weight="normal" fill="#93a3c7">D10</text>
+<circle cx="754" cy="308" r="5" fill="#fbbf24" stroke="#78350f" stroke-width="1"/>
+<text x="742" y="312" font-size="11" text-anchor="end" font-weight="bold" fill="#ffffff">D9</text>
+<circle cx="754" cy="334" r="5" fill="#fbbf24" stroke="#78350f" stroke-width="1"/>
+<text x="742" y="338" font-size="11" text-anchor="end" font-weight="normal" fill="#93a3c7">D8</text>
+<circle cx="754" cy="360" r="5" fill="#fbbf24" stroke="#78350f" stroke-width="1"/>
+<text x="742" y="364" font-size="11" text-anchor="end" font-weight="normal" fill="#93a3c7">D7</text>
+<circle cx="754" cy="386" r="5" fill="#fbbf24" stroke="#78350f" stroke-width="1"/>
+<text x="742" y="390" font-size="11" text-anchor="end" font-weight="bold" fill="#ffffff">D6</text>
+<circle cx="754" cy="412" r="5" fill="#fbbf24" stroke="#78350f" stroke-width="1"/>
+<text x="742" y="416" font-size="11" text-anchor="end" font-weight="bold" fill="#ffffff">D5</text>
+<circle cx="754" cy="438" r="5" fill="#fbbf24" stroke="#78350f" stroke-width="1"/>
+<text x="742" y="442" font-size="11" text-anchor="end" font-weight="bold" fill="#ffffff">D4</text>
+<circle cx="754" cy="464" r="5" fill="#fbbf24" stroke="#78350f" stroke-width="1"/>
+<text x="742" y="468" font-size="11" text-anchor="end" font-weight="normal" fill="#93a3c7">D3</text>
+<circle cx="754" cy="490" r="5" fill="#fbbf24" stroke="#78350f" stroke-width="1"/>
+<text x="742" y="494" font-size="11" text-anchor="end" font-weight="normal" fill="#93a3c7">D2</text>
+<circle cx="754" cy="516" r="5" fill="#fbbf24" stroke="#78350f" stroke-width="1"/>
+<text x="742" y="520" font-size="11" text-anchor="end" font-weight="bold" fill="#ffffff">GND</text>
+<circle cx="754" cy="542" r="5" fill="#fbbf24" stroke="#78350f" stroke-width="1"/>
+<text x="742" y="546" font-size="11" text-anchor="end" font-weight="normal" fill="#93a3c7">RST</text>
+<circle cx="754" cy="568" r="5" fill="#fbbf24" stroke="#78350f" stroke-width="1"/>
+<text x="742" y="572" font-size="11" text-anchor="end" font-weight="normal" fill="#93a3c7">RX0</text>
+<circle cx="754" cy="594" r="5" fill="#fbbf24" stroke="#78350f" stroke-width="1"/>
+<text x="742" y="598" font-size="11" text-anchor="end" font-weight="normal" fill="#93a3c7">TX1</text>
+<rect x="150" y="224" width="180" height="376" rx="8" fill="#f8fafc" stroke="#334155" stroke-width="2"/>
+<text x="162" y="310" font-size="15" text-anchor="start" font-weight="bold" fill="#1f2937">MPU-6050</text>
+<text x="162" y="328" font-size="12" text-anchor="start" font-weight="normal" fill="#475569">tip IMU (GY-521)</text>
+<text x="162" y="356" font-size="12" text-anchor="start" font-weight="normal" fill="#475569">4-wire cable down the</text>
+<text x="162" y="372" font-size="12" text-anchor="start" font-weight="normal" fill="#475569">shaft, in through the</text>
+<text x="162" y="388" font-size="12" text-anchor="start" font-weight="normal" fill="#475569">bottom-left hole</text>
+<text x="162" y="494" font-size="11" text-anchor="start" font-weight="normal" fill="#64748b">AD0, INT, XDA, XCL:</text>
+<text x="162" y="509" font-size="11" text-anchor="start" font-weight="normal" fill="#64748b">leave unconnected</text>
+<text x="320" y="260" font-size="12" text-anchor="end" font-weight="bold" fill="#1f2937">VCC</text>
+<polyline points="330,256 520,256" fill="none" stroke="#d93025" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="520" cy="256" r="5.5" fill="#d93025" stroke="#ffffff" stroke-width="1.5"/>
+<text x="320" y="416" font-size="12" text-anchor="end" font-weight="bold" fill="#1f2937">SDA</text>
+<polyline points="330,412 520,412" fill="none" stroke="#2563eb" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="520" cy="412" r="5.5" fill="#2563eb" stroke="#ffffff" stroke-width="1.5"/>
+<text x="320" y="442" font-size="12" text-anchor="end" font-weight="bold" fill="#1f2937">SCL</text>
+<polyline points="330,438 520,438" fill="none" stroke="#16a34a" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="520" cy="438" r="5.5" fill="#16a34a" stroke="#ffffff" stroke-width="1.5"/>
+<text x="320" y="572" font-size="12" text-anchor="end" font-weight="bold" fill="#1f2937">GND</text>
+<polyline points="330,568 520,568" fill="none" stroke="#1f2937" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="520" cy="568" r="5.5" fill="#1f2937" stroke="#ffffff" stroke-width="1.5"/>
+<circle cx="205" cy="150" r="30" fill="#334155" stroke="#0f172a" stroke-width="2"/>
+<circle cx="205" cy="150" r="20" fill="none" stroke="#94a3b8" stroke-width="1.5"/>
+<rect x="199" y="178" width="12" height="18" fill="#334155"/>
+<text x="247" y="136" font-size="14" text-anchor="start" font-weight="bold" fill="#1f2937">Round FSR (grip)</text>
+<text x="247" y="153" font-size="12" text-anchor="start" font-weight="normal" fill="#475569">on top of the handle; wires in</text>
+<text x="247" y="168" font-size="12" text-anchor="start" font-weight="normal" fill="#475569">through the top-right hole</text>
+<polyline points="208,196 208,186 546,186 546,256" fill="none" stroke="#d93025" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="546" cy="256" r="5.5" fill="#d93025" stroke="#ffffff" stroke-width="1.5"/>
+<text x="217" y="182" font-size="11" text-anchor="start" font-weight="normal" fill="#d93025">leg 1</text>
+<polyline points="202,196 202,196 120,196 120,684 598,684 598,620" fill="none" stroke="#ca8a04" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="598" cy="620" r="5.5" fill="#ca8a04" stroke="#ffffff" stroke-width="1.5"/>
+<text x="126" y="678" font-size="11" text-anchor="start" font-weight="normal" fill="#ca8a04">FSR leg 2</text>
+<rect x="539" y="574" width="14" height="40" rx="3" fill="#f5e6c8" stroke="#1f2937" stroke-width="2"/>
+<circle cx="546" cy="568" r="5.5" fill="#1f2937" stroke="#ffffff" stroke-width="1.5"/>
+<circle cx="546" cy="620" r="5.5" fill="#ca8a04" stroke="#ffffff" stroke-width="1.5"/>
+<text x="610" y="654" font-size="12" text-anchor="start" font-weight="bold" fill="#78350f">← 10 kΩ resistor</text>
+<polyline points="520,620 470,620 470,308 520,308" fill="none" stroke="#ca8a04" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="520" cy="620" r="5.5" fill="#ca8a04" stroke="#ffffff" stroke-width="1.5"/>
+<circle cx="520" cy="308" r="5.5" fill="#ca8a04" stroke="#ffffff" stroke-width="1.5"/>
+<text x="462" y="460" font-size="11" text-anchor="end" font-weight="normal" fill="#ca8a04">jumper</text>
+<text x="462" y="474" font-size="11" text-anchor="end" font-weight="normal" fill="#ca8a04">row 16 → A0</text>
+<rect x="230" y="750" width="180" height="70" rx="8" fill="#fef3c7" stroke="#a16207" stroke-width="2"/>
+<text x="320.0" y="782" font-size="15" text-anchor="middle" font-weight="bold" fill="#713f12">9 V battery</text>
+<text x="320.0" y="802" font-size="12" text-anchor="middle" font-weight="normal" fill="#713f12">(battery bay)</text>
+<text x="402" y="769" font-size="16" text-anchor="end" font-weight="bold" fill="#e8710a">+</text>
+<text x="402" y="814" font-size="18" text-anchor="end" font-weight="bold" fill="#1f2937">−</text>
+<polyline points="410,764 440,764 440,594 520,594" fill="none" stroke="#e8710a" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="520" cy="594" r="5.5" fill="#e8710a" stroke="#ffffff" stroke-width="1.5"/>
+<text x="446" y="744" font-size="11" text-anchor="start" font-weight="normal" fill="#e8710a">red → VIN only</text>
+<polyline points="410,808 572,808 572,568" fill="none" stroke="#1f2937" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="572" cy="568" r="5.5" fill="#1f2937" stroke="#ffffff" stroke-width="1.5"/>
+<text x="564" y="802" font-size="11" text-anchor="end" font-weight="normal" fill="#1f2937">black → GND</text>
+<circle cx="1010" cy="350" r="30" fill="#f8fafc" stroke="#334155" stroke-width="2"/>
+<text x="1010" y="355" font-size="13" text-anchor="middle" font-weight="bold" fill="#1f2937">RGB</text>
+<text x="1050" y="338" font-size="14" text-anchor="start" font-weight="bold" fill="#1f2937">RGB LED</text>
+<text x="1050" y="355" font-size="12" text-anchor="start" font-weight="normal" fill="#475569">in the top-left hole</text>
+<text x="1050" y="371" font-size="12" text-anchor="start" font-weight="normal" fill="#475569">common cathode</text>
+<polyline points="986,334 950,308 806,308" fill="none" stroke="#7c3aed" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<rect x="870" y="301" width="50" height="14" rx="3" fill="#f5e6c8" stroke="#7c3aed" stroke-width="2"/>
+<circle cx="806" cy="308" r="5.5" fill="#7c3aed" stroke="#ffffff" stroke-width="1.5"/>
+<text x="940" y="300" font-size="11" text-anchor="middle" font-weight="bold" fill="#7c3aed">B</text>
+<polyline points="981,362 950,386 806,386" fill="none" stroke="#7c3aed" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<rect x="870" y="379" width="50" height="14" rx="3" fill="#f5e6c8" stroke="#7c3aed" stroke-width="2"/>
+<circle cx="806" cy="386" r="5.5" fill="#7c3aed" stroke="#ffffff" stroke-width="1.5"/>
+<text x="940" y="378" font-size="11" text-anchor="middle" font-weight="bold" fill="#7c3aed">G</text>
+<polyline points="990,374 950,412 806,412" fill="none" stroke="#7c3aed" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<rect x="870" y="405" width="50" height="14" rx="3" fill="#f5e6c8" stroke="#7c3aed" stroke-width="2"/>
+<circle cx="806" cy="412" r="5.5" fill="#7c3aed" stroke="#ffffff" stroke-width="1.5"/>
+<text x="940" y="404" font-size="11" text-anchor="middle" font-weight="bold" fill="#7c3aed">R</text>
+<text x="900" y="262" font-size="11" text-anchor="middle" font-weight="normal" fill="#475569">220 Ω each, soldered</text>
+<text x="900" y="276" font-size="11" text-anchor="middle" font-weight="normal" fill="#475569">in line on the legs</text>
+<rect x="845" y="286" width="110" height="138" rx="6" fill="none" stroke="#94a3b8" stroke-dasharray="5 4"/>
+<polyline points="1010,380 1010,516 806,516" fill="none" stroke="#1f2937" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="806" cy="516" r="5.5" fill="#1f2937" stroke="#ffffff" stroke-width="1.5"/>
+<text x="1018" y="510" font-size="11" text-anchor="start" font-weight="normal" fill="#1f2937">longest leg</text>
+<rect x="850" y="530" width="370" height="110" rx="8" fill="none" stroke="#94a3b8" stroke-dasharray="5 4"/>
+<circle cx="1000" cy="580" r="22" fill="#ffffff" stroke="#1f2937" stroke-width="2"/>
+<line x1="988" y1="567" x2="988" y2="593" stroke="#1f2937" stroke-width="3"/>
+<line x1="988" y1="574" x2="1012" y2="560" stroke="#1f2937" stroke-width="2"/>
+<line x1="988" y1="586" x2="1012" y2="600" stroke="#1f2937" stroke-width="2"/>
+<polygon points="1012,600 1003,598 1007,591" fill="#1f2937"/>
+<text x="878" y="628" font-size="11" text-anchor="start" font-weight="normal" fill="#475569">2N4401, flat side facing you: legs E-B-C</text>
+<polyline points="806,438 868,438 868,580 988,580" fill="none" stroke="#7c3aed" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<rect x="880" y="573" width="60" height="14" rx="3" fill="#f5e6c8" stroke="#7c3aed" stroke-width="2"/>
+<circle cx="806" cy="438" r="5.5" fill="#7c3aed" stroke="#ffffff" stroke-width="1.5"/>
+<text x="910" y="568" font-size="11" text-anchor="middle" font-weight="bold" fill="#7c3aed">1 kΩ</text>
+<polyline points="1012,560 1012,558 1060,558" fill="none" stroke="#1f2937" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<rect x="1060" y="540" width="60" height="36" rx="5" fill="#fff7ed" stroke="#1f2937" stroke-width="2"/>
+<text x="1090.0" y="563" font-size="12" text-anchor="middle" font-weight="bold" fill="#1f2937">BZ</text>
+<text x="1056" y="554" font-size="13" text-anchor="end" font-weight="bold" fill="#1f2937">−</text>
+<text x="1072" y="536" font-size="13" text-anchor="middle" font-weight="bold" fill="#d93025">+</text>
+<text x="1128" y="554" font-size="12" text-anchor="start" font-weight="bold" fill="#1f2937">Active buzzer</text>
+<text x="1128" y="569" font-size="11" text-anchor="start" font-weight="normal" fill="#475569">under the lid grille</text>
+<polyline points="1072,540 1072,166 572,166 572,256" fill="none" stroke="#d93025" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="572" cy="256" r="5.5" fill="#d93025" stroke="#ffffff" stroke-width="1.5"/>
+<text x="1078" y="182" font-size="11" text-anchor="start" font-weight="normal" fill="#d93025">buzzer + → 3V3</text>
+<polyline points="1012,600 1012,690 780,690 780,516" fill="none" stroke="#1f2937" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="780" cy="516" r="5.5" fill="#1f2937" stroke="#ffffff" stroke-width="1.5"/>
+<rect x="640" y="730" width="560" height="150" rx="8" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5"/>
+<text x="656" y="754" font-size="13" text-anchor="start" font-weight="bold" fill="#1f2937">Pins used (D2 is free now that the FSR replaced the touch board)</text>
+<text x="656" y="778" font-size="12" text-anchor="start" font-weight="bold" fill="#1f2937">3V3</text>
+<text x="790" y="778" font-size="12" text-anchor="start" font-weight="normal" fill="#334155">MPU VCC · FSR leg 1 · buzzer +</text>
+<text x="656" y="795" font-size="12" text-anchor="start" font-weight="bold" fill="#1f2937">GND (left)</text>
+<text x="790" y="795" font-size="12" text-anchor="start" font-weight="normal" fill="#334155">MPU GND · 10 kΩ · battery −</text>
+<text x="656" y="812" font-size="12" text-anchor="start" font-weight="bold" fill="#1f2937">GND (right)</text>
+<text x="790" y="812" font-size="12" text-anchor="start" font-weight="normal" fill="#334155">transistor emitter · LED cathode</text>
+<text x="656" y="829" font-size="12" text-anchor="start" font-weight="bold" fill="#1f2937">A4 / A5</text>
+<text x="790" y="829" font-size="12" text-anchor="start" font-weight="normal" fill="#334155">MPU SDA / SCL</text>
+<text x="656" y="846" font-size="12" text-anchor="start" font-weight="bold" fill="#1f2937">A0</text>
+<text x="790" y="846" font-size="12" text-anchor="start" font-weight="normal" fill="#334155">FSR (via row 16 jumper)  ·  VIN: battery +</text>
+<text x="656" y="863" font-size="12" text-anchor="start" font-weight="bold" fill="#1f2937">D4 / D5 / D6 / D9</text>
+<text x="790" y="863" font-size="12" text-anchor="start" font-weight="normal" fill="#334155">buzzer (1 kΩ) / LED R / G / B (220 Ω)</text>
+<line x1="40" y1="842" x2="66" y2="842" stroke="#d93025" stroke-width="4" stroke-linecap="round"/>
+<text x="74" y="846" font-size="12" text-anchor="start" font-weight="normal" fill="#1f2937">3.3 V</text>
+<line x1="180" y1="842" x2="206" y2="842" stroke="#e8710a" stroke-width="4" stroke-linecap="round"/>
+<text x="214" y="846" font-size="12" text-anchor="start" font-weight="normal" fill="#1f2937">9 V</text>
+<line x1="320" y1="842" x2="346" y2="842" stroke="#1f2937" stroke-width="4" stroke-linecap="round"/>
+<text x="354" y="846" font-size="12" text-anchor="start" font-weight="normal" fill="#1f2937">GND</text>
+<line x1="460" y1="842" x2="486" y2="842" stroke="#2563eb" stroke-width="4" stroke-linecap="round"/>
+<text x="494" y="846" font-size="12" text-anchor="start" font-weight="normal" fill="#1f2937">SDA</text>
+<line x1="40" y1="864" x2="66" y2="864" stroke="#16a34a" stroke-width="4" stroke-linecap="round"/>
+<text x="74" y="868" font-size="12" text-anchor="start" font-weight="normal" fill="#1f2937">SCL</text>
+<line x1="180" y1="864" x2="206" y2="864" stroke="#ca8a04" stroke-width="4" stroke-linecap="round"/>
+<text x="214" y="868" font-size="12" text-anchor="start" font-weight="normal" fill="#1f2937">FSR / A0</text>
+<line x1="320" y1="864" x2="346" y2="864" stroke="#7c3aed" stroke-width="4" stroke-linecap="round"/>
+<text x="354" y="868" font-size="12" text-anchor="start" font-weight="normal" fill="#1f2937">outputs</text>
 </svg>

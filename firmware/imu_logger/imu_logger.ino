@@ -1,16 +1,17 @@
 // WALKASSIST - read both IMUs and the grip sensor at 100 Hz and stream them over USB.
 //
 // Handle IMU = LSM6DS3 on the Nano 33 IoT. Tip IMU = MPU-6050 over I2C.
-// Grip = AT42QT1010 touch breakout, OUT on D2.
+// Grip = round FSR on A0 (10 kOhm to GND).
 // Open Serial Monitor / Plotter at 115200 baud, or record with tools/log_serial.py.
 //
 // Output (lines starting with '#' are status messages, not data):
 //   CSV mode (default):
-//     t_ms,h_ax,h_ay,h_az,h_gx,h_gy,h_gz,t_ax,t_ay,t_az,t_gx,t_gy,t_gz,h_ok,t_ok,touch,gesture
+//     t_ms,h_ax,h_ay,h_az,h_gx,h_gy,h_gz,t_ax,t_ay,t_az,t_gx,t_gy,t_gz,h_ok,t_ok,touch,gesture,grip
 //     h_ = handle IMU, t_ = tip IMU, acceleration in g, rotation in deg/s,
 //     *_ok = 1 if that IMU was read this sample, 0 if not,
-//     touch = 1 while the grip is touched, gesture = 2 (double tap) or
-//     3 (triple tap) on the sample where a gesture finished, else 0.
+//     touch = 1 while the grip is pressed, gesture = 2 (double tap) or
+//     3 (triple tap) on the sample where a gesture finished, else 0,
+//     grip = grip pressure 0..1023 (how hard the user squeezes / leans).
 //   Plotter mode: accelerations only, labeled for the Arduino IDE Serial Plotter.
 //
 // Serial commands (type a letter, press Enter):
@@ -22,7 +23,7 @@
 #include <cane_imu.h>
 #include <cane_touch.h>
 
-const uint8_t TOUCH_PIN = 2;
+const uint8_t GRIP_PIN = A0;
 const uint32_t SAMPLE_PERIOD_US = 10000;  // 100 Hz
 const uint32_t I2C_CLOCK_HZ = 100000;     // 100 kHz: reliable over a long cable
 const uint8_t TIP_FAILS_BEFORE_LOST = 10; // consecutive failed reads
@@ -55,7 +56,7 @@ void setup() {
 
   Wire.begin();
   Wire.setClock(I2C_CLOCK_HZ);
-  touch.begin(TOUCH_PIN);
+  touch.begin(GRIP_PIN);
   pinMode(LED_BUILTIN, OUTPUT);  // mirrors the grip sensor
 
   handleOk = handleImu.begin();
@@ -101,7 +102,7 @@ void loop() {
   if (tRead) removeBias(t, tipBias);
 
   if (mode == MODE_CSV) {
-    printCsv(tMs, h, t, hRead, tRead, touch.touched(), pendingGesture);
+    printCsv(tMs, h, t, hRead, tRead, touch.touched(), pendingGesture, touch.pressure());
     pendingGesture = GESTURE_NONE;
   } else {
     printPlotter(h, t);
@@ -182,7 +183,7 @@ void removeBias(ImuSample& s, const float bias[3]) {
 // ----------------------------------------------------------------- output --
 void printHeader() {
   Serial.println("t_ms,h_ax,h_ay,h_az,h_gx,h_gy,h_gz,t_ax,t_ay,t_az,t_gx,t_gy,t_gz,"
-                 "h_ok,t_ok,touch,gesture");
+                 "h_ok,t_ok,touch,gesture,grip");
 }
 
 void printSample(const ImuSample& s) {
@@ -195,14 +196,15 @@ void printSample(const ImuSample& s) {
 }
 
 void printCsv(uint32_t tMs, const ImuSample& h, const ImuSample& t, bool hRead, bool tRead,
-              bool touched, Gesture g) {
+              bool touched, Gesture g, uint16_t grip) {
   Serial.print(tMs); Serial.print(',');
   printSample(h);
   printSample(t);
   Serial.print(hRead ? 1 : 0); Serial.print(',');
   Serial.print(tRead ? 1 : 0); Serial.print(',');
   Serial.print(touched ? 1 : 0); Serial.print(',');
-  Serial.println((int)g);
+  Serial.print((int)g); Serial.print(',');
+  Serial.println(grip);
 }
 
 void printPlotter(const ImuSample& h, const ImuSample& t) {
@@ -212,7 +214,8 @@ void printPlotter(const ImuSample& h, const ImuSample& t) {
   Serial.print(",t_ax:"); Serial.print(t.ax, 3);
   Serial.print(",t_ay:"); Serial.print(t.ay, 3);
   Serial.print(",t_az:"); Serial.print(t.az, 3);
-  Serial.print(",touch:"); Serial.println(touch.touched() ? 1 : 0);
+  Serial.print(",touch:"); Serial.print(touch.touched() ? 1 : 0);
+  Serial.print(",grip_x1000:"); Serial.println(touch.pressure() / 1000.0, 3);  // same scale as g
 }
 
 void printTriple(const float v[3]) {
@@ -232,8 +235,10 @@ void printStatus() {
   Serial.print(", WHO_AM_I=0x");
   Serial.println(tipImu.whoAmI, HEX);
 
-  Serial.print("# grip sensor (D2): ");
-  Serial.println(touch.touched() ? "touched" : "not touched");
+  Serial.print("# grip sensor (FSR on A0): ");
+  Serial.print(touch.touched() ? "pressed" : "not pressed");
+  Serial.print(", pressure ");
+  Serial.println(touch.pressure());
 
   Serial.print("# tip read errors: ");
   Serial.print(tipReadErrors);

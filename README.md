@@ -6,22 +6,24 @@ A smart cane that warns users before a fall by comparing their walking to their 
 
 | Done | Next |
 |---|---|
-| Dev setup: arduino-cli + VS Code tasks, git repo | Get parts: vibration motor (order), FSR + resistors |
-| Both IMUs read together at 100 Hz (`imu_logger`) | Mount everything on the cane (Phase 2) |
-| Grip touch sensor + double/triple tap gestures (temporary, see 1.4) | Record labeled walks (Phase 3) |
-| Laptop recorder + plotter (`tools/`) | Bench-test LED, buzzer, motor (1.5) |
-| | Replace touch board with an FSR (1.4) |
+| Dev setup: arduino-cli + VS Code tasks, git repo | Wire the round FSR and tune its threshold with `touch_test` (1.4) |
+| Both IMUs read together at 100 Hz (`imu_logger`) | Zip-tie the box on, mount the tip IMU and its cable (Phase 2) |
+| Grip code for the **round FSR on A0** + double/triple tap gestures, grip pressure logged | Record labeled walks (Phase 3) |
+| Laptop recorder + plotter (`tools/`) | Solder the LED and buzzer-driver assemblies, test them (1.5) |
+| Clamp box designed (`cad/`), **printed**, test-fitted on the cane with the Nano, breadboard and battery | |
+| Breadboard wiring diagram (`docs/circuit.svg`) | |
 
-Critical path: **mount → record → gait analysis**. Outputs and the FSR can happen in parallel.
+Critical path: **mount → record → gait analysis**. Outputs can happen in parallel.
 
 ## Design decisions (locked)
 
 | Topic | Decision |
 |---|---|
-| Inputs | Grip sensor (capacitive touch for now → **FSR pressure sensor**, see 1.4) + 2 IMUs (onboard LSM6DS3 at the handle, MPU-6050 near the tip over I2C) |
-| Outputs | Vibration motor (in-hand cues), RGB LED (status), **active buzzer** (fall alarm, locator) |
+| Inputs | **Round FSR** grip pressure sensor on A0 (replaced the capacitive touch board, see 1.4) + 2 IMUs (onboard LSM6DS3 at the handle, MPU-6050 near the tip over I2C) |
+| Outputs | **RGB LED** (visual: status and warnings) + **active buzzer** (audio: cues, fall alarm, locator). Two output modalities. The vibration motor was dropped: cues that were going to be in-hand vibrations are now short buzzer patterns + LED, which people nearby can also hear. |
 | Phone link | **WiFi access point** hosted by the Nano: the phone joins the cane's network and opens a status page. No app, no internet, works on any phone. (The Nano can't run WiFi and BLE at the same time, so we use one.) |
-| Power | **9 V battery** → Nano VIN (accepts ~4.5–21 V). Motor, LED, buzzer run from the Nano's 3.3 V pin through transistors. |
+| Power | **9 V battery** → Nano VIN (accepts ~4.5–21 V). LED and buzzer run from the Nano's 3.3 V pin (buzzer through a transistor). No power switch in the box: unplug the battery clip to turn off. |
+| Enclosure | 3D-printed box (`cad/clamp_box.scad`) zip-tied to the shaft just below the handle; sliding lid; the 9 V lies flat in its own bay; Nano on a **mini breadboard** (wiring: `docs/circuit.svg`). |
 | Baseline | 5-min calibration walk (30–60 s in **demo mode**), user confirms it, then slow updates during stable walking; saved to flash at the end of each walk |
 | Gestures | **Double tap** = cancel / "I'm OK" / accept baseline · **Triple tap** = re-calibrate. No SOS. (A long press can't work: gripping the cane while walking already looks like one.) |
 | Processing | No ML. Per-step features + z-scores on the fly; only the last ~30 **steps** kept in RAM. All sensing, scoring and alerts run on the cane. |
@@ -30,12 +32,15 @@ Critical path: **mount → record → gait analysis**. Outputs and the FSR can h
 
 | Path | What it is |
 |---|---|
-| `firmware/libraries/WalkAssist/` | Shared drivers: `cane_imu.h` (LSM6DS3, MPU-6050), `cane_touch.h` (grip + gestures) |
+| `firmware/libraries/WalkAssist/` | Shared drivers: `cane_imu.h` (LSM6DS3, MPU-6050), `cane_touch.h` (FSR grip + gestures) |
 | `firmware/i2c_scan/` | Lists I2C devices (wiring check) |
-| `firmware/imu_logger/` | Streams both IMUs + grip as CSV at 100 Hz |
-| `firmware/touch_test/` | Grip sensor test, gestures, hold test |
+| `firmware/imu_logger/` | Streams both IMUs + grip (pressed, gesture, pressure) as CSV at 100 Hz |
+| `firmware/touch_test/` | Grip (FSR) test: pressure readings, gestures, hold test |
+| `firmware/README.md` | Pin map, wiring, how to run the sketches |
 | `tools/arduino.sh` | Compile / upload / monitor (used by the VS Code tasks) |
 | `tools/log_serial.py`, `tools/plot_session.py` | Record labeled sessions to `data/`, plot them |
+| `cad/clamp_box.scad` | Parametric OpenSCAD model of the box (box, lid, fit and slide test pieces) |
+| `docs/circuit.svg` | Breadboard wiring diagram |
 
 ---
 
@@ -46,37 +51,30 @@ Critical path: **mount → record → gait analysis**. Outputs and the FSR can h
 | Part | Role |
 |---|---|
 | MPU-6050 (6-DOF) | IMU #2 near the tip (I2C `0x68`). |
-| Adafruit AT42QT1010 capacitive touch breakout | Grip sensor for now (drops output after ~20 s of touch; to be replaced by an FSR, see 1.4) |
-| SparkFun SEN-12041 capacitive touch breakout (same AT42QT1010 chip) | Spare grip sensor |
+| **Round FSR** (Alpha MF01A-N-221-A01) | Grip pressure sensor on A0 |
+| Mini breadboard (~17 rows, no power rails) | Holds the Nano; every wire plugs in next to its pin (see `docs/circuit.svg`) |
 | Active buzzer | Audio output |
-| 9 V battery with wires | Power → Nano VIN |
+| 9 V battery with snap clip | Power → Nano VIN |
+| Printed clamp box + lid | Enclosure on the cane |
 | Adafruit 9-DOF (L3GD20H + LSM303) | Backup tip IMU if MPU-6050s misbehave (needs a new driver) |
+| Adafruit / SparkFun AT42QT1010 touch boards | No longer used (time out after ~20 s, see 1.4) |
 
 ### Have — not needed (keep out of scope)
 
 Pulse sensor, TMP36 temperature sensor, APDS-9960, sound impact sensor, ADXL335, 3.7 V LiPo (would need a charger + 5 V boost; the 9 V battery replaces it).
 
-### Get from lab
+### Still to collect (lab inventory / ask)
 
 | Part | Purpose |
 |---|---|
-| **Square FSR** (Alpha MF02A-N-221-A01) + a round FSR (MF01A-N-221-A01) as spare | Grip pressure sensor (replaces the touch board) |
-| 2 × **2N4401** NPN transistor (same role as a 2N2222) | Motor + buzzer drivers |
-| Diode (1N4148 or 1N400x) | Across the vibration motor |
+| Resistors: **1 × 10 kΩ**, **1 × 1 kΩ**, **3 × 220 Ω** | FSR divider (on the breadboard), buzzer transistor base, LED colours |
+| 1 × **2N4401** NPN transistor | Buzzer driver |
 | RGB LED (check common cathode vs. anode) | Status light |
-| Slide or rocker switch, spare 9 V batteries | Power |
-| Heat shrink, conductive sheet, perf board, headers | Mounting, grip electrode, final wiring |
+| Female-female jumper wires | FSR legs (don't solder them), off-board assemblies |
+| 4-conductor wire (~1.5 m) | Tip IMU cable down the shaft, one continuous run |
+| Zip ties (4.8 × 1.4 mm fit the box slots), rubber strip, heat shrink | Mounting |
+| Spare 9 V batteries | Demo |
 
-### Still need to buy / ask for
-
-| Part | Purpose | Est. cost |
-|---|---|---|
-| **Coin vibration motor, 3 V (buy 2)** | Haptic output | $2–4 |
-| Resistors: 2 × 1 kΩ, 3 × 220 Ω, 1 × 10 kΩ | Transistor bases, LED, FSR divider | $1 |
-| 4-conductor wire (~1.5 m) | Tip IMU cable down the shaft, one continuous run | $2 |
-| Zip ties, Velcro, small project box | Mounting | $5 |
-
-- [ ] Order the vibration motor.
 - [ ] Check the buzzer is **active**: it beeps when connected straight to 3.3 V (a passive one only clicks).
 - [ ] Keep receipts for the final budget slide.
 
@@ -105,49 +103,49 @@ Pulse sensor, TMP36 temperature sensor, APDS-9960, sound impact sensor, ADXL335,
 - [ ] **Test with the full ~1.2 m cable** (chained jumpers OK for testing). Wiggle the wires while recording; tip-missing count should stay ~0. If not: twist SDA/SCL with GND, lower `I2C_CLOCK_HZ` to 50000. For the mounted cane, use one continuous soldered cable.
 
 ### 1.4 Grip sensor + gestures
-- [x] AT42QT1010 (Adafruit): VIN → 3.3 V, GND, OUT → D2 (HIGH when touched). Working with `touch_test`.
-- [x] Gestures in code (`cane_touch.h`): **double tap** and **triple tap** (each tap < 350 ms, gaps < 450 ms). Simulated sequences pass, including regripping and brief releases while walking.
-- [x] `touch` and `gesture` columns added to `imu_logger`, recorder and plots.
-- [x] **Hold test: the AT42QT1010 drops its output after ~20 s of continuous touch** (measured 20.3 s and 22.7 s with the hand still on the pad).
-
-> **Limitation — AT42QT1010 can't sense a continuous grip.** The chip has a fixed "max on-duration": after a long touch it assumes the pad is blocked, recalibrates, and reports "not touched" until the hand lets go and touches again. The datasheet gives ~60 s in low-power mode; the Adafruit board ships in fast mode, which shortens it to the ~20 s we measured. No pin or jumper disables it.
->
-> **Impact:** a user grips the cane for minutes while walking, so after ~20 s the cane thinks it was released. That breaks the grip + motion rules (Phase 5): a real fall would look like "released before impact" → dropped-cane chirp instead of the fall alarm, and walking can look like "carried". Taps and short touches still work.
->
-> **Plan:** keep the current touch code for now; replace the grip sensor with an **FSR** (square Alpha MF02A-N-221-A01 preferred, + 10 kΩ resistor to an analog pin). An FSR has no timeout and also measures how hard the user leans on the cane. Only `touched()` changes (pressure above a threshold); the tap-gesture logic stays.
-
-- [ ] Get the FSR and switch the grip sensor; re-run the hold test.
+- [x] Gestures in code (`cane_touch.h`): **double tap** and **triple tap** (each tap < 350 ms, gaps < 450 ms).
+- [x] **Switched to a round FSR on A0** (`cane_touch.h`): pressed above 150, released below 100 (0–1023), A0 sampled every 2 ms and lightly smoothed. `pressure()` also gives how hard the user leans on the cane.
+- [x] `touch`, `gesture` and `grip` (pressure) columns in `imu_logger`; grip pressure plotted by `plot_session.py`.
+- [x] Simulated tests pass: double / triple taps, regripping, brief releases while walking, a 2-minute hold staying pressed, a light resting hand not counting, noise near the threshold.
+- [ ] Wire it (FSR leg 1 → 3V3, leg 2 → free row 16 → jumper → A0, 10 kΩ from row 16 to GND) and run `touch_test`: note the pressure with no hand, a resting hand, a normal grip and leaning hard; adjust the thresholds so 150 sits between resting and gripping.
 - [ ] Try the gestures on the real grip; tune the timing constants if needed.
 - [ ] Update the proposal: "capacitive touch sensor" → "grip pressure sensor (FSR)".
 
+> **Why not the capacitive touch board:** the AT42QT1010 drops its output after ~20 s of continuous touch (measured 20.3 s and 22.7 s; it recalibrates and there's no way to turn that off). A user grips the cane for minutes while walking, so it would report "released" mid-walk and break the fall-vs-dropped rules. The FSR has no timeout.
+
 ### 1.5 Outputs
-- [ ] **Vibration motor:** D3 → 1 kΩ → 2N4401 base; emitter → GND; motor between 3.3 V and collector; diode across the motor (stripe toward 3.3 V). Test PWM strength and patterns.
-- [ ] **Active buzzer:** D4 → 1 kΩ → 2N4401 base; buzzer between 3.3 V and collector. On/off only; vary the **beep timing** to tell sounds apart (short chirps = locator, fast continuous = alarm).
-- [ ] **RGB LED:** D5 / D6 / D9 through 220 Ω each. Green, amber (red + some green), red, blinking.
+The breadboard has no spare rows for these, so each is a small soldered assembly with wires that plug in next to its pin (dashed boxes in `docs/circuit.svg`).
+- [ ] **Active buzzer driver:** 2N4401 (flat side facing you: E-B-C). 1 kΩ on the base → wire to **D4**; buzzer − on the collector, buzzer + → **3V3**; emitter → **GND** (right). On/off only; vary the **beep timing** to tell sounds apart (soft ticks = rhythm cue, short chirps = locator, fast continuous = alarm).
+- [ ] **RGB LED:** 220 Ω soldered on each colour leg → **D5** (red), **D6** (green), **D9** (blue); common (longest) leg → **GND** (right). Pushed into the top-left hole of the box.
 - [ ] `output_test` sketch that cycles through all patterns.
 
 ### 1.6 Power
-- [ ] 9 V clip (through the switch) → VIN and GND. Confirm the Nano boots with USB unplugged.
-- [ ] Never connect 9 V to the 3.3 V pin or to the motor/buzzer directly.
+- [ ] 9 V clip: red → **VIN**, black → **GND** (left). Tin the stranded ends so they push firmly into the breadboard. Confirm the Nano boots with USB unplugged.
+- [ ] Never connect 9 V to the 3.3 V pin or to the buzzer directly.
+- [ ] No switch in the box: unplug the clip to turn off (or add an inline switch on the red wire, out through a wire hole).
 - [ ] Measure current while running (multimeter in series) to estimate battery life; bring spare batteries to the demo either way.
 
 ---
 
 ## Phase 2 — Mount on the cane
 
-- [ ] Handle box: Nano, buzzer, LED (visible from above), 9 V battery + switch (Velcro).
-- [ ] Grip sensor on top of the grip where the palm rests; vibration motor under the palm.
+Box: `cad/clamp_box.scad`, about **60 × 86 × 37.5 mm** (inside 52 × 81 × 20 mm: 27 mm battery bay, divider, 52 mm electronics bay). Openings: top end = LED (left), USB (middle), grip wires (right); bottom end = tip IMU cable; lid = buzzer grille.
+
+- [x] Fit test, slide test and full box printed; Nano on the mini breadboard and the 9 V fit, USB lines up with its opening.
+- [ ] Mount the box: rubber strip on the shaft, then each of the 3 zip ties up through one slot, across the floor groove, down the other slot and around the shaft (before the breadboard and battery go in).
+- [ ] Stick the breadboard to the floor (its own adhesive back), battery flat in its bay, lid slid down until it clicks.
+- [ ] Round FSR on top of the grip where the palm presses hardest, under one thin layer of tape; wires in through the top-right hole.
 - [ ] Tip IMU ~10–15 cm above the rubber tip, mounted **rigidly** (hot glue + zip ties + heat shrink).
-- [ ] 4-wire cable down the shaft, zip-tied every ~15 cm, strain relief at both ends.
+- [ ] 4-wire cable down the shaft, zip-tied every ~15 cm, strain relief at both ends, in through the bottom hole.
 - [ ] Record the shaft axis of each IMU (the one reading ±1 g with the cane upright).
-- [ ] Shake test and drop test onto a soft surface: nothing comes loose, I2C keeps reading.
+- [ ] Shake test and drop test onto a soft surface: nothing comes loose (breadboard wires included), I2C keeps reading.
 - [ ] Photos for the final slides and video.
 
 ---
 
 ## Phase 3 — Data collection
 
-- [x] Firmware **logger mode** (`imu_logger`): `t_ms, h_ax…h_gz, t_ax…t_gz, h_ok, t_ok, touch, gesture` as CSV at 100 Hz.
+- [x] Firmware **logger mode** (`imu_logger`): `t_ms, h_ax…h_gz, t_ax…t_gz, h_ok, t_ok, touch, gesture, grip` as CSV at 100 Hz.
 - [x] Recorder (`tools/log_serial.py --label <name>`): saves to `data/<label>_<time>.csv`; press Enter to add a marker.
 - [x] Plotter (`tools/plot_session.py`): both IMUs, grip, markers, gestures.
 - [ ] Record labeled sessions (each teammate, several times):
@@ -162,7 +160,7 @@ Pulse sensor, TMP36 temperature sensor, APDS-9960, sound impact sensor, ADXL335,
   - [ ] Grip lost at impact, then re-gripped within 5 s
   - [ ] Cane carried, in a car / bag, leaned against a wall
   - [ ] Double and triple taps, while standing and while walking
-- [ ] Until the FSR is in, don't trust the `touch` column past ~20 s of continuous grip. Re-record the grip-dependent sessions (drop, fall, carried) after the switch.
+- [ ] Record with the FSR wired, so the grip columns are valid for the grip-dependent sessions (drop, fall, carried).
 - [ ] Decide whether `data/` goes in git (recordings can get large) or in `.gitignore`.
 
 ---
@@ -189,7 +187,7 @@ Prototype in Python on the recordings first, then port to Arduino C++.
 
 States: `WALKING`, `STANDING`, `CARRIED`, `PARKED`, `DROPPED`, `REGRIP_WAIT`, `FALL_CANCEL`, `FALL_ALARM`, `CALIBRATING`.
 
-Needs the FSR grip sensor (1.4): the touch board can't report a continuous grip.
+Uses the FSR grip sensor (1.4), which reports a continuous grip. Grip pressure can also tell "leaning on the cane" from "lightly holding it".
 
 | Grip | Motion | Means | Cane does |
 |---|---|---|---|
@@ -201,7 +199,7 @@ Needs the FSR grip sensor (1.4): the touch board can't report a continuous grip.
 | Held through impact | Ends flat and still | Person fell | Fall alarm with 15 s cancel |
 | Lost at impact | Ends flat and still | Unclear | Wait **5 s** for re-grip. Re-gripped → resume, log a stumble. Not re-gripped → fall alarm with 15 s cancel |
 
-- [ ] Fall flow: `FALL_CANCEL` (15 s: red LED, strong repeated haptic, buzzer countdown beeps) → double tap cancels → otherwise `FALL_ALARM` (continuous buzzer, red flashing, alert on the phone page).
+- [ ] Fall flow: `FALL_CANCEL` (15 s: red LED, buzzer countdown beeps getting faster) → double tap cancels → otherwise `FALL_ALARM` (continuous buzzer, red flashing, alert on the phone page).
 - [ ] **Parked → sleep:** lower the IMU rate, turn off the LED, wake on grip.
 - [ ] Test every row against the recordings; tune thresholds.
 
@@ -210,7 +208,7 @@ Needs the FSR grip sensor (1.4): the touch board can't report a continuous grip.
 ## Phase 6 — Baseline and risk score
 
 - [ ] **Calibration:** walk 5 min (demo mode: 30–60 s) → store mean and std of each feature.
-- [ ] **User confirms:** when calibration finishes, the cane gives a double haptic pulse; **double tap** to accept, **triple tap** to redo.
+- [ ] **User confirms:** when calibration finishes, the cane gives a double beep and blinks green; **double tap** to accept, **triple tap** to redo.
 - [ ] **Re-calibrate any time:** triple tap (accept it only while standing still, so it isn't triggered while walking).
 - [ ] **Adapt:** update mean/std slowly (exponential moving average) only while the score is green.
 - [ ] **Save** the baseline to flash after calibration and at the end of each walk (not continuously; flash wears out).
@@ -224,18 +222,19 @@ Needs the FSR grip sensor (1.4): the touch board can't report a continuous grip.
 
 | Conclusion | Evidence (vs. own baseline) | Cane responds |
 |---|---|---|
-| Stable | All features in normal range | Green LED, no haptic |
-| Unsteady gait | Stride-time variability or lateral sway above baseline | Amber LED, haptic rhythm cue at the user's own cadence |
-| Fatigue | Cadence + swing angle trending down over the session, more shuffling | Amber LED, "rest" haptic (slow double pulse) |
-| Slippery / uneven surface | Tip-slip jolt | Short warning pulse, amber LED |
-| Near-fall | Stumble (jolt, then fast re-plant) | Strong haptic burst, amber LED, logged for the caregiver |
-| High risk, no fall | Score > 60 sustained | **Red LED, strong repeated "stop and rest" haptic**, logged + warning on the phone page. No buzzer. |
+| Stable | All features in normal range | Green LED, silent |
+| Unsteady gait | Stride-time variability or lateral sway above baseline | Amber LED, short buzzer ticks at the user's own cadence (rhythm cue) |
+| Fatigue | Cadence + swing angle trending down over the session, more shuffling | Amber LED, "rest" pattern (slow double beep every few seconds) |
+| Slippery / uneven surface | Tip-slip jolt | One short beep, amber flash |
+| Near-fall | Stumble (jolt, then fast re-plant) | Three quick beeps, amber flashing, logged for the caregiver |
+| High risk, no fall | Score > 60 sustained | **Red LED, repeated "stop and rest" beep pattern**, logged + warning on the phone page. Never the continuous fall alarm. |
 | Dropped cane | See Phase 5 | Locator chirps, blinking LED |
 | Fall | Held through impact, flat and still (or no re-grip within 5 s) | Red LED, buzzer, 15 s cancel, then phone alert |
 
-- [ ] Non-blocking pattern player for haptic / LED / buzzer (no `delay()`, sensing never stops).
-- [ ] Haptic acknowledges every gesture (short tap back).
-- [ ] Rhythm cue timed to the baseline stride interval.
+- [ ] Non-blocking pattern player for LED / buzzer (no `delay()`, sensing never stops).
+- [ ] Every gesture is acknowledged (one short chirp + LED blink).
+- [ ] Rhythm cue ticks timed to the baseline stride interval; keep them short so they guide without becoming noise.
+- [ ] Every pattern must be distinct by ear: rhythm ticks, rest double-beep, near-fall triple beep, locator chirps, countdown, alarm.
 
 ---
 
@@ -258,7 +257,7 @@ Needs the FSR grip sensor (1.4): the touch board can't report a continuous grip.
 - [ ] Run the full demo script 5+ times in a row without re-flashing.
 - [ ] 10 min of normal walking → no warnings (false-alarm check).
 - [ ] Carry the cane, drop it, lean it on a wall → never scored as walking, never a fall alarm.
-- [ ] Fresh 9 V battery for the demo + spares; spare grip sensor and motor; USB cable.
+- [ ] Fresh 9 V battery for the demo + spares; spare grip sensor and buzzer; USB cable.
 
 ---
 
@@ -266,12 +265,12 @@ Needs the FSR grip sensor (1.4): the touch board can't report a continuous grip.
 
 ### Demo script
 1. Turn on in demo mode; walk 30–60 s → baseline learned; double tap to accept; LED green.
-2. Walk unsteadily (knee brace, irregular rhythm) → amber LED, haptic rhythm cue.
-3. Keep walking badly → score > 60 sustained → red LED, strong haptic, warning on the phone page.
+2. Walk unsteadily (knee brace, irregular rhythm) → amber LED, buzzer rhythm ticks.
+3. Keep walking badly → score > 60 sustained → red LED, "stop and rest" beeps, warning on the phone page.
 4. Drop the cane → locator chirps, blinking LED.
 5. Lay the cane down while still gripped → fall countdown; double tap cancels. Repeat without cancelling → alarm + FALL ALERT on the phone page.
 
-- [ ] Record the 1-minute video before class (close-ups of LED, haptic, phone page).
+- [ ] Record the 1-minute video before class (close-ups of the LED and phone page, with sound on for the buzzer).
 - [ ] One handout / poster slide: inputs, outputs, intelligence, novelty.
 - [ ] Check the demo hits each rubric item: multimodal input, multimodal output, intelligent, beyond screen, useful, robust, novel.
 
@@ -287,8 +286,10 @@ Needs the FSR grip sensor (1.4): the touch board can't report a continuous grip.
 | Baseline learned during an unusual walk | User confirms at the end of calibration; triple tap re-calibrates |
 | Taps triggered by normal gripping | Taps must be short touches after a release; accept triple tap only while standing |
 | 9 V battery runs low during the demo | Fresh battery + spares; parked → sleep |
-| AT42QT1010 reports "released" after ~20 s of continuous grip (confirmed) | Replace with an FSR before Phase 5; until then, don't trust `touch` in recordings longer than ~20 s |
-| FSR misses a light grip | Place it where the palm presses hardest; tune the threshold per user; square FSR covers more area |
+| Round FSR misses a light grip (small ~13 mm sensing area) | Place it where the palm presses hardest; tune the thresholds per user; the square FSR covers more area if needed |
+| Breadboard wires work loose as the cane taps the ground | Cut wires to length, strain-relieve them, dab of hot glue at the ends once working; soldered assemblies for the LED and buzzer |
+| Lid too tight / loose, or doesn't click | `slide_clear` and `detent_h` in `cad/clamp_box.scad`; reprint only the lid |
 | Absolute speed too noisy | Report speed only as a trend vs. baseline |
-| Motor vibration shows up in the handle IMU | Ignore IMU samples during motor pulses |
+| Beep cues annoy the user or people nearby | Ticks only while the gait is unsteady; short beeps; the loud continuous sound is reserved for a fall |
+| Buzzer cues missed in a noisy place | LED shows the same state; the phone page shows warnings |
 | WiFi page fails at the demo | Cane works offline; show the summary over USB Serial |
